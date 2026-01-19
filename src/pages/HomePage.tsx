@@ -10,7 +10,7 @@ const HomePage = () => {
   const [readingsCount, setReadingsCount] = useState<number>(0)
   const [streakDays, setStreakDays] = useState<number>(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
-  const [homeImage, setHomeImage] = useState("https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80") // Default cute dog/pet image
+  const [homeImage, setHomeImage] = useState("https://lf-trae-resources.trae.ai/obj/trae-ai-public/9906d573673f32488880a1c6e1197825.jpg")
 
   useEffect(() => {
     fetchStats()
@@ -92,12 +92,17 @@ const HomePage = () => {
     }
   }
 
-  const handleImageUpload = () => {
-    const url = prompt("Please enter the URL of the image you want to use:")
-    if (url) {
-      setHomeImage(url)
-      localStorage.setItem('home_image', url)
-      setIsImageModalOpen(false)
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setHomeImage(base64String)
+        localStorage.setItem('home_image', base64String)
+        setIsImageModalOpen(false)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -107,7 +112,7 @@ const HomePage = () => {
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Image Section - Top Left, Portrait, Moderate Size */}
           <div 
-            className="w-48 h-64 flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer shadow-md"
+            className="w-48 h-64 flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer shadow-md bg-muted"
             onClick={() => setIsImageModalOpen(true)}
           >
             <img 
@@ -115,7 +120,9 @@ const HomePage = () => {
               alt="Personal" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">Change Photo</span>
+            </div>
           </div>
 
           <div className="flex-1 pt-4">
@@ -152,16 +159,30 @@ const HomePage = () => {
       <Modal
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
-        title="My Photo"
+        title="Update Profile Photo"
       >
-        <div className="space-y-4">
-          <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted">
+        <div className="space-y-6">
+          <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative">
             <img src={homeImage} alt="Preview" className="w-full h-full object-cover" />
           </div>
-          <div className="flex justify-end">
-            <button onClick={handleImageUpload} className="btn-primary flex items-center gap-2">
-              <Plus className="h-4 w-4" /> Replace Image
-            </button>
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-center">Choose a new photo</label>
+            <div className="flex justify-center">
+              <label className="btn-primary cursor-pointer flex items-center gap-2 px-6 py-2">
+                <Plus className="h-4 w-4" />
+                <span>Select from Device</span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageUpload} 
+                  className="hidden" 
+                />
+              </label>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Supports JPG, PNG, GIF (Max 5MB recommended)
+            </p>
           </div>
         </div>
       </Modal>
