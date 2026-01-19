@@ -32,7 +32,7 @@ const HomePage = () => {
       // Calculate streak from words dates
       if (words.length > 0) {
         const dates = [...new Set(words.map((w: any) => new Date(w.created_at).toDateString()))]
-          .map(d => new Date(d).getTime())
+          .map(d => new Date(d as string).getTime())
           .sort((a, b) => b - a)
         
         let streak = 0
