@@ -4,7 +4,7 @@ import { supabase } from '@/supabase/client'
 import { User, Lock, ArrowRight } from 'lucide-react'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('lxtlcr@example.com')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState(() => {
     return localStorage.getItem('saved_password') || ''
   })
@@ -34,7 +34,7 @@ const LoginPage = () => {
             password,
             options: {
               data: {
-                name: 'lxtlcr',
+                name: email.split('@')[0],
               },
             },
           })
@@ -84,14 +84,16 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Account</label>
+              <label className="text-sm font-medium leading-none">Email</label>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <input
-                  type="text"
-                  value="lxtlcr"
-                  readOnly
-                  className="input-base pl-10 bg-secondary/50 cursor-not-allowed"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-base pl-10"
+                  placeholder="name@example.com"
+                  required
                 />
               </div>
             </div>
