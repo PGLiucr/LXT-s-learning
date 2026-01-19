@@ -1,16 +1,14 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/supabase/client'
-import { useAuthStore } from '@/store/authStore'
 import { User, Lock, ArrowRight } from 'lucide-react'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('lxtlcr@example.com')
+  const [password, setPassword] = useState('123456')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
-  const { loginWithMock } = useAuthStore()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,24 +21,45 @@ const LoginPage = () => {
         password,
       })
       
-      if (error) throw error
+      if (error) {
+        // If login fails, try to register automatically
+        if (error.message.includes('Invalid login credentials')) {
+          const { error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name: 'lxtlcr',
+              },
+            },
+          })
+          
+          if (signUpError) throw signUpError
+          
+          // After auto-register, try login again immediately
+          const { error: retryLoginError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+          
+          if (retryLoginError) {
+             // If immediate login fails (likely due to email confirmation), inform user
+             if (retryLoginError.message.includes('Email not confirmed')) {
+               throw new Error('Account created! Please check your email to confirm.')
+             }
+             throw retryLoginError
+          }
+          navigate('/')
+          return
+        }
+        throw error
+      }
       navigate('/')
     } catch (err: any) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleDemoLogin = () => {
-    loginWithMock()
-    navigate('/')
-  }
-
-  // Pre-fill helper function
-  const fillCredentials = (e: string, p: string) => {
-    setEmail(e)
-    setPassword(p)
   }
 
   return (
@@ -60,16 +79,14 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Email</label>
+              <label className="text-sm font-medium leading-none">Account</label>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-base pl-10"
-                  placeholder="name@example.com"
-                  required
+                  type="text"
+                  value="lxtlcr"
+                  readOnly
+                  className="input-base pl-10 bg-secondary/50 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -98,41 +115,6 @@ const LoginPage = () => {
             {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
           </button>
         </form>
-        
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Quick Access</span>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <button
-            onClick={handleDemoLogin}
-            className="w-full py-2.5 bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors border border-transparent text-sm font-medium"
-          >
-            Guest Mode (No Data Sync)
-          </button>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => fillCredentials('demo@example.com', 'password123')}
-              className="py-2 px-3 text-xs border border-border hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground text-left"
-            >
-              <div className="font-medium text-foreground">Test User</div>
-              demo@example.com
-            </button>
-            <button
-              onClick={() => fillCredentials('admin@example.com', 'admin123')}
-              className="py-2 px-3 text-xs border border-border hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground text-left"
-            >
-              <div className="font-medium text-foreground">Admin User</div>
-              admin@example.com
-            </button>
-          </div>
-        </div>
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account? <Link to="/register" className="font-medium text-primary hover:underline underline-offset-4">Create account</Link>

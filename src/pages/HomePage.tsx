@@ -38,9 +38,17 @@ const HomePage = () => {
         <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight mb-4">
           Welcome Back
         </h1>
-        <p className="text-xl text-muted-foreground font-serif italic">
+        <p className="text-xl text-muted-foreground font-serif italic mb-6">
           "The limits of my language mean the limits of my world."
         </p>
+        <div className="w-full h-[400px] rounded-lg overflow-hidden relative group">
+          <img 
+            src="https://lf-trae-resources.trae.ai/obj/trae-ai-public/9906d573673f32488880a1c6e1197825.jpg" 
+            alt="Study Environment" 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500" />
+        </div>
       </header>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
