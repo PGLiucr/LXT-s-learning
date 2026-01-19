@@ -5,6 +5,8 @@ import { User, Lock, ArrowRight } from 'lucide-react'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
+  // Initialize password from localStorage, but default to empty string if not found
+  // User explicitly requested NOT to pre-fill/hardcode it initially, but to remember it after first use.
   const [password, setPassword] = useState(() => {
     return localStorage.getItem('saved_password') || ''
   })
