@@ -5,7 +5,9 @@ import { User, Lock, ArrowRight } from 'lucide-react'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('lxtlcr@example.com')
-  const [password, setPassword] = useState('123456')
+  const [password, setPassword] = useState(() => {
+    return localStorage.getItem('saved_password') || ''
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
@@ -14,6 +16,9 @@ const LoginPage = () => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    
+    // Save password for future visits
+    localStorage.setItem('saved_password', password)
     
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -66,7 +71,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-serif font-bold tracking-tight">Welcome Back</h1>
+          <h1 className="text-3xl font-serif font-bold tracking-tight">Welcome Back 老铁</h1>
           <p className="text-muted-foreground">Continue your English learning journey</p>
         </div>
         

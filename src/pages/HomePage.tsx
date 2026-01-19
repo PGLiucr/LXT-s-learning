@@ -5,6 +5,8 @@ import { supabase } from '@/supabase/client'
 const HomePage = () => {
   const { user, isMock } = useAuthStore()
   const [wordCount, setWordCount] = useState<number>(0)
+  const [readingsCount, setReadingsCount] = useState<number>(0)
+  const [streakDays, setStreakDays] = useState<number>(0)
 
   useEffect(() => {
     fetchStats()
@@ -12,23 +14,24 @@ const HomePage = () => {
 
   const fetchStats = async () => {
     if (isMock) {
-      // Try to read from localStorage first for more accurate mock stats
+      // Mock Data Sync (Reading from localStorage)
       const storedWords = localStorage.getItem('mock_words')
-      if (storedWords) {
-        const words = JSON.parse(storedWords)
-        setWordCount(words.length)
-      } else {
-        // Fallback to initial mock data count if nothing in storage
-        setWordCount(2)
-      }
-    } else if (user) {
-      const { count, error } = await supabase
-        .from('words')
-        .select('*', { count: 'exact', head: true })
+      const storedReadings = localStorage.getItem('mock_readings') // Assuming you will add this later or now
       
-      if (!error && count !== null) {
-        setWordCount(count)
-      }
+      setWordCount(storedWords ? JSON.parse(storedWords).length : 2)
+      setReadingsCount(storedReadings ? JSON.parse(storedReadings).length : 0)
+      setStreakDays(12) // Mock streak for now
+    } else if (user) {
+      // Real Data Sync from Supabase
+      const { count: wCount } = await supabase.from('words').select('*', { count: 'exact', head: true })
+      const { count: rCount } = await supabase.from('reading_records').select('*', { count: 'exact', head: true })
+      
+      setWordCount(wCount || 0)
+      setReadingsCount(rCount || 0)
+      
+      // Simple streak logic: check consecutive days of activity (simplified for now)
+      // For now we'll keep streak static or calculate from logs if we had a logs table
+      setStreakDays(12) 
     }
   }
 
@@ -53,14 +56,14 @@ const HomePage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300">
-          <h2 className="text-2xl font-bold mb-2">Daily Progress</h2>
-          <div className="text-4xl font-serif font-bold mb-2">85%</div>
-          <p className="text-muted-foreground text-sm">Target completed today</p>
+          <h2 className="text-2xl font-bold mb-2">Daily Readings</h2>
+          <div className="text-4xl font-serif font-bold mb-2">{readingsCount}</div>
+          <p className="text-muted-foreground text-sm">Articles read total</p>
         </div>
         
         <div className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300">
           <h2 className="text-2xl font-bold mb-2">Word Streak</h2>
-          <div className="text-4xl font-serif font-bold mb-2">12 <span className="text-lg font-normal text-muted-foreground">days</span></div>
+          <div className="text-4xl font-serif font-bold mb-2">{streakDays} <span className="text-lg font-normal text-muted-foreground">days</span></div>
           <p className="text-muted-foreground text-sm">Keep up the momentum</p>
         </div>
 
