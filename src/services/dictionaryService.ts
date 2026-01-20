@@ -4,8 +4,8 @@ import { CET6_SAMPLE } from '@/data/cet6_sample'
 // For now, we return our expanded dataset which simulates the external source
 export const fetchCET6Vocabulary = async () => {
   try {
-    // Fetch from KyleBing's repository (CET-6 vocabulary)
-    const response = await fetch('https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/4-CET6-%E9%A1%BA%E5%BA%8F.json')
+    // Fetch from KyleBing's repository (CET-6 vocabulary) via jsdelivr CDN for better availability in China
+    const response = await fetch('https://cdn.jsdelivr.net/gh/KyleBing/english-vocabulary@master/json/4-CET6-%E9%A1%BA%E5%BA%8F.json')
     if (!response.ok) throw new Error('Failed to fetch vocabulary')
     
     const data = await response.json()
