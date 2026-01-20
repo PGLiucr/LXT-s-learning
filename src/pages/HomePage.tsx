@@ -12,9 +12,9 @@ const HomePage = () => {
   const [streakDays, setStreakDays] = useState<number>(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const navigate = useNavigate()
-  // Use a reliable local SVG data URI as placeholder
-  const DEFAULT_IMAGE = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTJlOGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzFlMjkzYiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QWRkIFBob3RvPC90ZXh0Pjwvc3ZnPg=="
-  const [homeImage, setHomeImage] = useState(DEFAULT_IMAGE)
+  // Use a reliable placeholder service that is globally accessible
+  // Using a solid color placeholder logic instead of an image tag for default to ensure reliability
+  const [homeImage, setHomeImage] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStats()
@@ -122,14 +122,22 @@ const HomePage = () => {
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Image Section - Top Left, Portrait, Moderate Size */}
           <div 
-            className="w-48 h-64 flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer shadow-md bg-muted"
+            className="w-48 h-64 flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer shadow-md bg-muted flex items-center justify-center"
             onClick={() => setIsImageModalOpen(true)}
           >
-            <img 
-              src={homeImage}
-              alt="Personal" 
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            {homeImage ? (
+              <img 
+                src={homeImage}
+                alt="Personal" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground w-full h-full bg-slate-100">
+                <Plus className="h-8 w-8 opacity-50" />
+                <span className="font-serif italic text-sm">Add Photo</span>
+              </div>
+            )}
+            
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
               <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">Change Photo</span>
             </div>
@@ -181,8 +189,15 @@ const HomePage = () => {
         title="Update Profile Photo"
       >
         <div className="space-y-6">
-          <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative">
-            <img src={homeImage} alt="Preview" className="w-full h-full object-cover" />
+          <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative flex items-center justify-center">
+            {homeImage ? (
+              <img src={homeImage} alt="Preview" className="w-full h-full object-cover" />
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <Plus className="h-12 w-12 opacity-50" />
+                <span className="font-serif italic">No image selected</span>
+              </div>
+            )}
           </div>
           
           <div className="space-y-2">
