@@ -2,10 +2,124 @@ import { Word } from '@/types'
 
 export const CET6_SAMPLE: Omit<Word, 'id' | 'user_id' | 'created_at' | 'review_date' | 'mastery_level'>[] = [
   {
+    english_word: "Abnormal",
+    chinese_meaning: "反常的，变态的",
+    phonetic_symbol: "/æbˈnɔːml/",
+    example_sentence: "They thought his behavior was abnormal."
+  },
+  {
+    english_word: "Abolish",
+    chinese_meaning: "废除，取消",
+    phonetic_symbol: "/əˈbɒlɪʃ/",
+    example_sentence: "Slavery was abolished in the US in the 19th century."
+  },
+  {
+    english_word: "Abrupt",
+    chinese_meaning: "突然的，意外的",
+    phonetic_symbol: "/əˈbrʌpt/",
+    example_sentence: "The match came to an abrupt end."
+  },
+  {
+    english_word: "Absurd",
+    chinese_meaning: "荒谬的，可笑的",
+    phonetic_symbol: "/əbˈsɜːd/",
+    example_sentence: "That's an absurd idea!"
+  },
+  {
+    english_word: "Accessory",
+    chinese_meaning: "附件，配件",
+    phonetic_symbol: "/əkˈsesəri/",
+    example_sentence: "She bought a new dress and matching accessories."
+  },
+  {
+    english_word: "Accommodate",
+    chinese_meaning: "容纳；向...提供住宿",
+    phonetic_symbol: "/əˈkɒmədeɪt/",
+    example_sentence: "The hotel can accommodate up to 500 guests."
+  },
+  {
+    english_word: "Addict",
+    chinese_meaning: "使沉溺；瘾君子",
+    phonetic_symbol: "/ˈædɪkt/",
+    example_sentence: "He is a drug addict."
+  },
+  {
+    english_word: "Adhere",
+    chinese_meaning: "粘附；坚持",
+    phonetic_symbol: "/ədˈhɪə(r)/",
+    example_sentence: "Clean the surface so the tape will adhere."
+  },
+  {
+    english_word: "Adverse",
+    chinese_meaning: "不利的，有害的",
+    phonetic_symbol: "/ˈædvɜːs/",
+    example_sentence: "The drug has no adverse side effects."
+  },
+  {
+    english_word: "Aesthetic",
+    chinese_meaning: "审美的，美学的",
+    phonetic_symbol: "/iːsˈθetɪk/",
+    example_sentence: "The building has little aesthetic value."
+  },
+  {
+    english_word: "Affiliate",
+    chinese_meaning: "使隶属于",
+    phonetic_symbol: "/əˈfɪlieɪt/",
+    example_sentence: "The hospital is affiliated with the university."
+  },
+  {
+    english_word: "Agony",
+    chinese_meaning: "极度痛苦",
+    phonetic_symbol: "/ˈæɡəni/",
+    example_sentence: "He was in agony with a broken leg."
+  },
+  {
+    english_word: "Alienate",
+    chinese_meaning: "使疏远",
+    phonetic_symbol: "/ˈeɪliəneɪt/",
+    example_sentence: "His comments alienated many voters."
+  },
+  {
+    english_word: "Allegation",
+    chinese_meaning: "指控",
+    phonetic_symbol: "/ˌæləˈɡeɪʃn/",
+    example_sentence: "He denied the allegations against him."
+  },
+  {
     english_word: "Ambiguous",
     chinese_meaning: "模棱两可的，含糊不清的",
     phonetic_symbol: "/æmˈbɪɡjuəs/",
     example_sentence: "The wording of the agreement is ambiguous."
+  },
+  {
+    english_word: "Ambitious",
+    chinese_meaning: "有野心的",
+    phonetic_symbol: "/æmˈbɪʃəs/",
+    example_sentence: "She is an ambitious young lawyer."
+  },
+  {
+    english_word: "Ample",
+    chinese_meaning: "充足的",
+    phonetic_symbol: "/ˈæmpl/",
+    example_sentence: "There is ample evidence to prove his guilt."
+  },
+  {
+    english_word: "Analogy",
+    chinese_meaning: "类比",
+    phonetic_symbol: "/əˈnælədʒi/",
+    example_sentence: "The teacher drew an analogy between the human heart and a pump."
+  },
+  {
+    english_word: "Anonymous",
+    chinese_meaning: "匿名的",
+    phonetic_symbol: "/əˈnɒnɪməs/",
+    example_sentence: "The donor wishes to remain anonymous."
+  },
+  {
+    english_word: "Applaud",
+    chinese_meaning: "鼓掌；称赞",
+    phonetic_symbol: "/əˈplɔːd/",
+    example_sentence: "The audience applauded loudly."
   },
   {
     english_word: "Hypothesis",
@@ -80,7 +194,7 @@ export const CET6_SAMPLE: Omit<Word, 'id' | 'user_id' | 'created_at' | 'review_d
     example_sentence: "It is not feasible to build a bridge at this point."
   },
   {
-    english_word: "Inherenty",
+    english_word: "Inherently",
     chinese_meaning: "天性地，固有地",
     phonetic_symbol: "/ɪnˈhɪərəntli/",
     example_sentence: "Nuclear power is inherently dangerous."
@@ -120,5 +234,71 @@ export const CET6_SAMPLE: Omit<Word, 'id' | 'user_id' | 'created_at' | 'review_d
     chinese_meaning: "减轻，缓和",
     phonetic_symbol: "/əˈliːvieɪt/",
     example_sentence: "The drugs did nothing to alleviate her pain."
+  },
+  {
+    english_word: "Bewilder",
+    chinese_meaning: "使迷惑，难住",
+    phonetic_symbol: "/bɪˈwɪldə(r)/",
+    example_sentence: "She was totally bewildered by his explanation."
+  },
+  {
+    english_word: "Capability",
+    chinese_meaning: "能力，性能",
+    phonetic_symbol: "/ˌkeɪpəˈbɪləti/",
+    example_sentence: "She has the capability to become a very good teacher."
+  },
+  {
+    english_word: "Catastrophe",
+    chinese_meaning: "大灾难",
+    phonetic_symbol: "/kəˈtæstrəfi/",
+    example_sentence: "Early warnings of the coming catastrophe."
+  },
+  {
+    english_word: "Certify",
+    chinese_meaning: "证明，颁发证书",
+    phonetic_symbol: "/ˈsɜːtɪfaɪ/",
+    example_sentence: "The accounts were certified by an auditor."
+  },
+  {
+    english_word: "Chronicle",
+    chinese_meaning: "编年史；记录",
+    phonetic_symbol: "/ˈkrɒnɪkl/",
+    example_sentence: "The book chronicles the events of the war."
+  },
+  {
+    english_word: "Collaborate",
+    chinese_meaning: "合作",
+    phonetic_symbol: "/kəˈlæbəreɪt/",
+    example_sentence: "We have collaborated on many projects."
+  },
+  {
+    english_word: "Commence",
+    chinese_meaning: "开始",
+    phonetic_symbol: "/kəˈmens/",
+    example_sentence: "The meeting is scheduled to commence at noon."
+  },
+  {
+    english_word: "Competent",
+    chinese_meaning: "有能力的，胜任的",
+    phonetic_symbol: "/ˈkɒmpɪtənt/",
+    example_sentence: "He is very competent in his work."
+  },
+  {
+    english_word: "Compile",
+    chinese_meaning: "汇编，编辑",
+    phonetic_symbol: "/kəmˈpaɪl/",
+    example_sentence: "We are compiling a list of potential customers."
+  },
+  {
+    english_word: "Conceive",
+    chinese_meaning: "构想；怀孕",
+    phonetic_symbol: "/kənˈsiːv/",
+    example_sentence: "I cannot conceive of why he did such a thing."
+  },
+  {
+    english_word: "Concise",
+    chinese_meaning: "简明的",
+    phonetic_symbol: "/kənˈsaɪs/",
+    example_sentence: "Make your answers clear and concise."
   }
 ]
