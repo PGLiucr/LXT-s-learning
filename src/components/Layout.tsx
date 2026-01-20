@@ -27,6 +27,14 @@ const Layout = () => {
             </div>
             <span className="text-xl font-serif font-bold tracking-tight text-primary hidden md:inline">XinTong's Learning Plan</span>
           </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6 ml-8">
+            <NavLink to="/words" className={({ isActive }) => `text-sm font-bold hover:text-primary transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>Dictionary</NavLink>
+            <NavLink to="/reading" className={({ isActive }) => `text-sm font-bold hover:text-primary transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>Reading</NavLink>
+            <NavLink to="/quiz" className={({ isActive }) => `text-sm font-bold hover:text-primary transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>Grammar</NavLink>
+            <NavLink to="/notes" className={({ isActive }) => `text-sm font-bold hover:text-primary transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>Notes</NavLink>
+          </nav>
         </div>
         
         <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { Plus } from 'lucide-react'
 import Modal from '@/components/Modal'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
   const { user, isMock } = useAuthStore()
@@ -10,6 +11,7 @@ const HomePage = () => {
   const [readingsCount, setReadingsCount] = useState<number>(0)
   const [streakDays, setStreakDays] = useState<number>(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+  const navigate = useNavigate()
   // Use a reliable placeholder service that is globally accessible
   const DEFAULT_IMAGE = "https://placehold.co/400x500/e2e8f0/1e293b?text=Add+Photo"
   const [homeImage, setHomeImage] = useState(DEFAULT_IMAGE)
@@ -145,20 +147,29 @@ const HomePage = () => {
       </header>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300">
-          <h2 className="text-2xl font-bold mb-2">Daily Readings</h2>
+        <div 
+          onClick={() => navigate('/reading')}
+          className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
+        >
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Daily Readings</h2>
           <div className="text-4xl font-serif font-bold mb-2">{readingsCount}</div>
           <p className="text-muted-foreground text-sm">Articles read total</p>
         </div>
         
-        <div className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300">
-          <h2 className="text-2xl font-bold mb-2">Word Streak</h2>
+        <div 
+          onClick={() => navigate('/words')}
+          className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
+        >
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Word Streak</h2>
           <div className="text-4xl font-serif font-bold mb-2">{streakDays} <span className="text-lg font-normal text-muted-foreground">days</span></div>
           <p className="text-muted-foreground text-sm">Consecutive learning days</p>
         </div>
 
-        <div className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300">
-          <h2 className="text-2xl font-bold mb-2">Words Learned</h2>
+        <div 
+          onClick={() => navigate('/words')}
+          className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
+        >
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Words Learned</h2>
           <div className="text-4xl font-serif font-bold mb-2">{wordCount}</div>
           <p className="text-muted-foreground text-sm">Total vocabulary size</p>
         </div>
