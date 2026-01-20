@@ -79,19 +79,26 @@ const ReadingPage = () => {
       }
       closeModal()
     } else if (user) {
-      if (editingReading) {
-        const { error } = await supabase
-          .from('reading_records')
-          .update(formData)
-          .eq('id', editingReading.id)
-        if (!error) fetchReadings()
-      } else {
-        const { error } = await supabase
-          .from('reading_records')
-          .insert([{ user_id: user.id, ...formData }])
-        if (!error) fetchReadings()
+      try {
+        if (editingReading) {
+          const { error } = await supabase
+            .from('reading_records')
+            .update(formData)
+            .eq('id', editingReading.id)
+          if (error) throw error
+          fetchReadings()
+        } else {
+          const { error } = await supabase
+            .from('reading_records')
+            .insert([{ user_id: user.id, ...formData }])
+          if (error) throw error
+          fetchReadings()
+        }
+        closeModal()
+      } catch (err: any) {
+        console.error('Error saving reading record:', err)
+        alert(`Failed to save reading record: ${err.message}`)
       }
-      closeModal()
     }
   }
 
@@ -101,8 +108,14 @@ const ReadingPage = () => {
     if (isMock) {
       setReadings(readings.filter(r => r.id !== id))
     } else {
-      const { error } = await supabase.from('reading_records').delete().eq('id', id)
-      if (!error) fetchReadings()
+      try {
+        const { error } = await supabase.from('reading_records').delete().eq('id', id)
+        if (error) throw error
+        fetchReadings()
+      } catch (err: any) {
+        console.error('Error deleting reading record:', err)
+        alert(`Failed to delete reading record: ${err.message}`)
+      }
     }
   }
 

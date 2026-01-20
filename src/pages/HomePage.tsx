@@ -10,13 +10,21 @@ const HomePage = () => {
   const [readingsCount, setReadingsCount] = useState<number>(0)
   const [streakDays, setStreakDays] = useState<number>(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
-  const [homeImage, setHomeImage] = useState("https://lf-trae-resources.trae.ai/obj/trae-ai-public/9906d573673f32488880a1c6e1197825.jpg")
+  // Use a reliable placeholder service that is globally accessible
+  const DEFAULT_IMAGE = "https://placehold.co/400x500/e2e8f0/1e293b?text=Add+Photo"
+  const [homeImage, setHomeImage] = useState(DEFAULT_IMAGE)
 
   useEffect(() => {
     fetchStats()
     // Load saved image from local storage if exists
-    const savedImage = localStorage.getItem('home_image')
-    if (savedImage) setHomeImage(savedImage)
+    try {
+      const savedImage = localStorage.getItem('home_image')
+      if (savedImage && savedImage.startsWith('data:image')) {
+        setHomeImage(savedImage)
+      }
+    } catch (e) {
+      console.error("Failed to load image from storage", e)
+    }
   }, [user, isMock])
 
   const fetchStats = async () => {

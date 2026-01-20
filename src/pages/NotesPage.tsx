@@ -79,19 +79,26 @@ const NotesPage = () => {
       }
       closeModal()
     } else if (user) {
-      if (editingNote) {
-        const { error } = await supabase
-          .from('learning_notes')
-          .update({ ...formData, updated_at: new Date().toISOString() })
-          .eq('id', editingNote.id)
-        if (!error) fetchNotes()
-      } else {
-        const { error } = await supabase
-          .from('learning_notes')
-          .insert([{ user_id: user.id, ...formData }])
-        if (!error) fetchNotes()
+      try {
+        if (editingNote) {
+          const { error } = await supabase
+            .from('learning_notes')
+            .update({ ...formData, updated_at: new Date().toISOString() })
+            .eq('id', editingNote.id)
+          if (error) throw error
+          fetchNotes()
+        } else {
+          const { error } = await supabase
+            .from('learning_notes')
+            .insert([{ user_id: user.id, ...formData }])
+          if (error) throw error
+          fetchNotes()
+        }
+        closeModal()
+      } catch (err: any) {
+        console.error('Error saving note:', err)
+        alert(`Failed to save note: ${err.message}`)
       }
-      closeModal()
     }
   }
 
@@ -101,8 +108,14 @@ const NotesPage = () => {
     if (isMock) {
       setNotes(notes.filter(n => n.id !== id))
     } else {
-      const { error } = await supabase.from('learning_notes').delete().eq('id', id)
-      if (!error) fetchNotes()
+      try {
+        const { error } = await supabase.from('learning_notes').delete().eq('id', id)
+        if (error) throw error
+        fetchNotes()
+      } catch (err: any) {
+        console.error('Error deleting note:', err)
+        alert(`Failed to delete note: ${err.message}`)
+      }
     }
   }
 

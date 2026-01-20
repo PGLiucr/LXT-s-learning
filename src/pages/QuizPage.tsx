@@ -77,11 +77,17 @@ const QuizPage = () => {
       setScores([newScore, ...scores])
       closeModal()
     } else if (user) {
-      const { error } = await supabase
-        .from('quiz_scores')
-        .insert([{ user_id: user.id, ...dataToSave }])
-      if (!error) fetchScores()
-      closeModal()
+      try {
+        const { error } = await supabase
+          .from('quiz_scores')
+          .insert([{ user_id: user.id, ...dataToSave }])
+        if (error) throw error
+        fetchScores()
+        closeModal()
+      } catch (err: any) {
+        console.error('Error saving quiz score:', err)
+        alert(`Failed to save quiz score: ${err.message}`)
+      }
     }
   }
 

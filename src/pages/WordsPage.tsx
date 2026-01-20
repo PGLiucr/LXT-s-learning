@@ -95,19 +95,31 @@ const WordsPage = () => {
       localStorage.setItem('mock_words', JSON.stringify(updatedWords))
       closeModal()
     } else if (user) {
-      if (editingWord) {
-        const { error } = await supabase
-          .from('words')
-          .update(formData)
-          .eq('id', editingWord.id)
-        if (!error) fetchWords()
-      } else {
-        const { error } = await supabase
-          .from('words')
-          .insert([{ user_id: user.id, ...formData }])
-        if (!error) fetchWords()
+      try {
+        if (editingWord) {
+          const { error } = await supabase
+            .from('words')
+            .update(formData)
+            .eq('id', editingWord.id)
+          if (error) throw error
+          fetchWords()
+        } else {
+          const { error } = await supabase
+            .from('words')
+            .insert([{ 
+              user_id: user.id, 
+              ...formData,
+              mastery_level: 0,
+              review_date: new Date().toISOString()
+            }])
+          if (error) throw error
+          fetchWords()
+        }
+        closeModal()
+      } catch (err: any) {
+        console.error('Error saving word:', err)
+        alert(`Failed to save word: ${err.message}. Please check your connection or permissions.`)
       }
-      closeModal()
     }
   }
 
@@ -119,8 +131,14 @@ const WordsPage = () => {
       setWords(updatedWords)
       localStorage.setItem('mock_words', JSON.stringify(updatedWords))
     } else {
-      const { error } = await supabase.from('words').delete().eq('id', id)
-      if (!error) fetchWords()
+      try {
+        const { error } = await supabase.from('words').delete().eq('id', id)
+        if (error) throw error
+        fetchWords()
+      } catch (err: any) {
+        console.error('Error deleting word:', err)
+        alert(`Failed to delete word: ${err.message}`)
+      }
     }
   }
 
