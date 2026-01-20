@@ -56,12 +56,14 @@ const LoginPage = () => {
              }
              throw retryLoginError
           }
-          navigate('/')
+          // Use replace to prevent going back to login
+          navigate('/', { replace: true })
           return
         }
         throw error
       }
-      navigate('/')
+      // Use replace to prevent going back to login
+      navigate('/', { replace: true })
     } catch (err: any) {
       setError(err.message)
     } finally {

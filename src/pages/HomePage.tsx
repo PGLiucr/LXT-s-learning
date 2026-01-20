@@ -12,8 +12,8 @@ const HomePage = () => {
   const [streakDays, setStreakDays] = useState<number>(0)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const navigate = useNavigate()
-  // Use a reliable placeholder service that is globally accessible
-  const DEFAULT_IMAGE = "https://placehold.co/400x500/e2e8f0/1e293b?text=Add+Photo"
+  // Use a reliable local SVG data URI as placeholder
+  const DEFAULT_IMAGE = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTJlOGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzFlMjkzYiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QWRkIFBob3RvPC90ZXh0Pjwvc3ZnPg=="
   const [homeImage, setHomeImage] = useState(DEFAULT_IMAGE)
 
   useEffect(() => {
