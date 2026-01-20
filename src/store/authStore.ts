@@ -18,10 +18,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   loading: true,
   isMock: false,
   initialize: async () => {
-    if (get().isMock) return
+    // Prevent multiple initializations or re-initialization if already loaded
+    if (get().isMock || (get().session && !get().loading)) return
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      // Set a timeout to prevent infinite loading if Supabase is unreachable
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Auth timeout')), 5000)
+      )
+
+      const sessionPromise = supabase.auth.getSession()
+      
+      const result = await Promise.race([sessionPromise, timeoutPromise]) as any
+      const session = result.data?.session
+      
       set({ session, user: session?.user ?? null, loading: false })
 
       supabase.auth.onAuthStateChange((_event, session) => {
@@ -29,6 +39,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
     } catch (error) {
       console.error('Auth initialization error:', error)
+      // On error (e.g., timeout or config missing), stop loading so user isn't stuck
       set({ loading: false })
     }
   },
