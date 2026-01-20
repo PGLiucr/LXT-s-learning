@@ -516,7 +516,16 @@ const WordsPage = () => {
       >
         <div className="space-y-4">
           <div className="max-h-[60vh] overflow-y-auto border border-border rounded-lg divide-y divide-border">
-            {CET6_SAMPLE.map((word, idx) => {
+            {libraryLoading ? (
+              <div className="p-8 text-center text-muted-foreground">
+                Loading library...
+              </div>
+            ) : libraryWords.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                No words loaded. Please try again.
+              </div>
+            ) : (
+              libraryWords.map((word, idx) => {
               // Check if word is already in user's list
               const isAlreadyAdded = words.some(w => w.english_word.toLowerCase() === word.english_word.toLowerCase())
               const isSelected = selectedLibraryWords.includes(word.english_word)
@@ -545,7 +554,8 @@ const WordsPage = () => {
                   )}
                 </div>
               )
-            })}
+            })
+            )}
           </div>
           <div className="flex justify-between items-center pt-4 border-t border-border">
             <span className="text-sm text-muted-foreground">

@@ -12,14 +12,16 @@ export const fetchCET6Vocabulary = async () => {
     
     // Transform the data to match our Word interface
     // The source format is: { word: string, translations: { translation: string, type: string }[], phrases: ... }
-    return data.map((item: any) => ({
-      english_word: item.word,
-      chinese_meaning: item.translations.map((t: any) => t.translation).join('; '),
-      phonetic_symbol: item.phonetic || '', // Some entries might have it, though mostly missing in this specific file
-      example_sentence: item.phrases && item.phrases.length > 0 
-        ? `${item.phrases[0].phrase} - ${item.phrases[0].translation}`
-        : ''
-    }))
+    return data
+      .filter((item: any) => item && item.word) // Filter out invalid entries
+      .map((item: any) => ({
+        english_word: item.word,
+        chinese_meaning: item.translations ? item.translations.map((t: any) => t.translation).join('; ') : '',
+        phonetic_symbol: item.phonetic || '', // Some entries might have it, though mostly missing in this specific file
+        example_sentence: item.phrases && item.phrases.length > 0 
+          ? `${item.phrases[0].phrase} - ${item.phrases[0].translation}`
+          : ''
+      }))
   } catch (error) {
     console.error("Failed to fetch from external source, falling back to sample:", error)
     // Fallback to sample data if fetch fails

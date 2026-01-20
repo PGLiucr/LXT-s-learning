@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { Outlet, NavLink } from 'react-router-dom'
-import { Menu, GraduationCap } from 'lucide-react'
+import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Menu, GraduationCap, Home } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-background">
@@ -17,7 +18,10 @@ const Layout = () => {
             <Menu className="h-6 w-6 text-primary" />
           </button>
           
-          <div className="flex items-center gap-3">
+          <div 
+            className="flex items-center gap-3 cursor-pointer" 
+            onClick={() => navigate('/')}
+          >
             <div className="bg-primary text-primary-foreground p-1">
               <GraduationCap className="h-6 w-6" />
             </div>
@@ -25,7 +29,15 @@ const Layout = () => {
           </div>
         </div>
         
-        {/* Right side header content (optional) */}
+        <div className="flex items-center gap-2">
+           <button 
+            onClick={() => navigate('/')}
+            className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
+            title="Go to Home"
+          >
+            <Home className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

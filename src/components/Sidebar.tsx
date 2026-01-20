@@ -38,6 +38,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
         
         <div className="py-2">
+          <div onClick={() => handleNavigation('/')} className="px-6 py-4 hover:bg-muted cursor-pointer flex justify-between items-center border-b border-border/50">
+            <span className="font-bold text-slate-900">Home</span>
+          </div>
           <div onClick={() => handleNavigation('/words')} className="px-6 py-4 hover:bg-muted cursor-pointer flex justify-between items-center border-b border-border/50">
             <span className="font-bold text-slate-900">Dictionary (Words)</span>
             <Plus className="h-4 w-4 text-slate-900" />
