@@ -125,7 +125,17 @@ const Layout = () => {
               <div className="absolute right-0 top-12 w-72 bg-white rounded-xl shadow-xl border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-4 border-b border-border flex items-center gap-3">
-                   <div className="w-12 h-12 rounded-full overflow-hidden border border-border flex-shrink-0">
+                   <div 
+                     className="w-12 h-12 rounded-full overflow-hidden border border-border flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity relative group"
+                     onClick={handleAvatarClick}
+                   >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="User" className="w-full h-full object-cover" />
                     ) : (
@@ -133,56 +143,57 @@ const Layout = () => {
                         <User className="h-6 w-6" />
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Plus className="h-4 w-4 text-white" />
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-slate-900 truncate">{user?.email?.split('@')[0] || '刘超然'}</h3>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                      <span>ByteDance</span>
-                      <span className="bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded text-[10px] font-medium flex items-center gap-0.5">
-                        <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
-                        已认证
-                      </span>
-                    </div>
+                    <h3 className="font-bold text-slate-900 truncate">{user?.email?.split('@')[0] || 'User'}</h3>
                   </div>
                 </div>
 
                 {/* Menu Items */}
                 <div className="py-2">
-                  <div className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group">
+                  <div 
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
+                    onClick={toggleTheme}
+                  >
                     <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">外观</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">浅色</span>
+                      <span className="text-xs text-muted-foreground">{isDarkMode ? '深色' : '浅色'}</span>
                       <ChevronRight className="h-4 w-4 text-slate-400" />
                     </div>
                   </div>
                   
-                  <div className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group">
+                  <div 
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
+                    onClick={toggleLanguage}
+                  >
                     <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">语言</span>
-                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{language === 'zh' ? '中文' : 'English'}</span>
+                      <ChevronRight className="h-4 w-4 text-slate-400" />
+                    </div>
                   </div>
                   
-                  <div className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group">
+                  <div 
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
+                    onClick={() => {
+                      handleLogout()
+                    }}
+                  >
                     <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">切换账号</span>
                     <ChevronRight className="h-4 w-4 text-slate-400" />
                   </div>
                   
                   <div className="my-1 border-t border-border/50"></div>
                   
-                  <div className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group">
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">设置</span>
-                  </div>
-                  
-                  <div className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group">
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">帮助中心</span>
-                  </div>
-                  
-                  <div className="my-1 border-t border-border/50"></div>
-                  
                   <div 
                     onClick={handleLogout}
-                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">退出登录</span>
+                    <span className="text-sm font-medium">退出登录</span>
+                    <LogOut className="h-4 w-4" />
                   </div>
                 </div>
               </div>
