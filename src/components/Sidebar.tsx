@@ -31,8 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className={`fixed top-0 left-0 h-full w-80 bg-background border-r border-border z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 flex justify-between items-center border-b border-border">
           <div className="flex items-center gap-2 font-serif font-bold text-xl text-foreground">
-            <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center rounded">C</div>
-            <span>Cambridge</span>
+            {/* Logo removed */}
           </div>
           <button onClick={onClose} className="p-2 hover:bg-muted rounded-full">
             <X className="h-5 w-5 text-foreground" />
@@ -56,39 +55,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <div onClick={() => handleNavigation('/notes')} className="px-6 py-4 hover:bg-muted cursor-pointer flex justify-between items-center border-b border-border/50">
             <span className="font-bold text-foreground">{t('sidebar.notes')}</span>
           </div>
-          <div className="px-6 py-4 hover:bg-muted cursor-pointer flex justify-between items-center border-b border-border/50">
-            <span className="font-bold text-blue-600 dark:text-blue-400">{t('sidebar.plus')}</span>
-          </div>
         </div>
 
         <div className="mt-auto border-t border-border p-4 space-y-4 bg-muted/30 absolute bottom-0 w-full">
           <div onClick={() => handleNavigation('/profile')} className="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded cursor-pointer font-bold text-foreground">
             <User className="h-5 w-5 text-foreground" />
             <span>{t('sidebar.login')}</span>
-          </div>
-          <div className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded cursor-pointer font-bold text-foreground">
-            <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5" />
-              <span>English (US)</span>
-            </div>
-            <span className="text-sm text-blue-600 dark:text-blue-400 font-normal hover:underline">Change</span>
-          </div>
-          
-          <div className="pt-4 border-t border-border/50">
-            <div className="flex items-center justify-between px-2">
-              <span className="font-bold text-foreground">{t('sidebar.follow')}</span>
-              <div className="flex gap-4">
-                <div className="w-8 h-8 flex items-center justify-center bg-muted rounded-full hover:bg-muted/80 cursor-pointer">
-                  <span className="font-bold text-foreground">f</span>
-                </div>
-                <div className="w-8 h-8 flex items-center justify-center bg-muted rounded-full hover:bg-muted/80 cursor-pointer">
-                  <div className="w-4 h-4 border-2 border-foreground rounded-sm"></div>
-                </div>
-                <div className="w-8 h-8 flex items-center justify-center bg-muted rounded-full hover:bg-muted/80 cursor-pointer">
-                  <span className="font-bold text-foreground">X</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
