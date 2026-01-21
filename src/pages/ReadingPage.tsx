@@ -230,7 +230,37 @@ const ReadingPage = () => {
   const filteredCET6 = largeLibrary.filter(article =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.summary.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 50) // Limit render for now, or use pagination/infinite scroll
+  ).slice(0, 50)
+
+  // Combined readings for "My Readings" tab
+  const myReadingsCombined = useMemo(() => {
+    const favoritedArticles = largeLibrary.filter(article => favorites.has(article.id)).map(article => ({
+      id: article.id,
+      user_id: user?.id || 'mock-user',
+      article_title: article.title,
+      article_content: article.content, // Or summary if preferred
+      reading_notes: '', // CET-6 articles don't have user notes initially
+      reading_time: article.duration * 60, // Convert mins to seconds
+      created_at: new Date().toISOString(), // Use current time or store favorite time
+      is_cet6_favorite: true,
+      cet6_data: article // Store original data for display
+    })) as any[] // Type casting for mixed array
+
+    // Filter user readings by search
+    const userReadingsFiltered = readings.filter(reading => 
+      reading.article_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      reading.article_content.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    
+    // Filter favorite articles by search
+    const favArticlesFiltered = favoritedArticles.filter(reading => 
+        reading.article_title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    return [...userReadingsFiltered, ...favArticlesFiltered].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+  }, [readings, favorites, largeLibrary, searchQuery, user])
 
   return (
     <div className="space-y-8 relative">
@@ -287,46 +317,80 @@ const ReadingPage = () => {
       {activeTab === 'my-readings' ? (
         loading ? (
           <div className="text-center py-12 text-muted-foreground">Loading readings...</div>
-        ) : filteredReadings.length === 0 ? (
+        ) : myReadingsCombined.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-border bg-muted/30">
             <p className="text-muted-foreground">{t('reading.empty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6">
-            {filteredReadings.map((reading) => (
-              <div key={reading.id} className="group bg-card border border-border p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-serif font-bold group-hover:text-primary/80 transition-colors">
-                    {reading.article_title}
-                  </h3>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEditModal(reading)} className="p-1 hover:text-primary text-muted-foreground transition-colors">
-                      <Edit2 className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => handleDelete(reading.id)} className="p-1 hover:text-red-600 text-muted-foreground transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="prose prose-neutral max-w-none mb-6 text-foreground/80 line-clamp-3">
-                  {reading.article_content}
-                </div>
+            {myReadingsCombined.map((reading) => (
+              <div 
+                key={reading.id} 
+                className="group bg-card border border-border p-6 hover:shadow-lg transition-all duration-500 animate-in slide-in-from-bottom-4 fade-in fill-mode-both"
+                style={{ animationDelay: `${Math.random() * 0.2}s` }}
+              >
+                <div className="flex flex-col md:flex-row gap-6">
+                   {/* Show image if it's a CET-6 favorite */}
+                   {reading.cet6_data && (
+                     <div className="w-full md:w-48 h-32 flex-shrink-0 overflow-hidden rounded-lg relative cursor-pointer" onClick={() => openArticle(reading.cet6_data)}>
+                        <img 
+                          src={reading.cet6_data.imageUrl} 
+                          alt={reading.article_title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute top-2 right-2">
+                           <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
+                        </div>
+                     </div>
+                   )}
+                   
+                   <div className="flex-1">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 
+                          className="text-2xl font-serif font-bold group-hover:text-primary/80 transition-colors cursor-pointer"
+                          onClick={() => reading.cet6_data ? openArticle(reading.cet6_data) : openEditModal(reading)}
+                        >
+                          {reading.article_title}
+                        </h3>
+                        {!reading.cet6_data && (
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => openEditModal(reading)} className="p-1 hover:text-primary text-muted-foreground transition-colors">
+                              <Edit2 className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => handleDelete(reading.id)} className="p-1 hover:text-red-600 text-muted-foreground transition-colors">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
+                        {reading.cet6_data && (
+                           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button onClick={(e) => toggleFavorite(reading.id, e)} className="p-1 text-pink-500 hover:text-pink-600 transition-colors" title="Remove from favorites">
+                               <Trash2 className="h-4 w-4" />
+                             </button>
+                           </div>
+                        )}
+                      </div>
+                      
+                      <div className="prose prose-neutral max-w-none mb-4 text-foreground/80 line-clamp-2">
+                        {reading.article_content}
+                      </div>
 
-                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground border-t border-border pt-4">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {Math.round(reading.reading_time / 60)} {t('reading.minutes')} read
-                  </div>
-                  {reading.reading_notes && (
-                    <div className="flex items-center gap-1 text-primary">
-                      <BookOpen className="h-4 w-4" />
-                      Has notes
-                    </div>
-                  )}
-                  <div className="ml-auto font-serif italic">
-                    {new Date(reading.created_at).toLocaleDateString()}
-                  </div>
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground border-t border-border pt-4 items-center">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {Math.round(reading.reading_time / 60)} {t('reading.minutes')} read
+                        </div>
+                        {reading.reading_notes && (
+                          <div className="flex items-center gap-1 text-primary">
+                            <BookOpen className="h-4 w-4" />
+                            Has notes
+                          </div>
+                        )}
+                        <div className="ml-auto font-serif italic text-xs flex items-center gap-2">
+                          <span>Added: {new Date(reading.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                   </div>
                 </div>
               </div>
             ))}
