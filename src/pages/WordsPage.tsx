@@ -6,9 +6,11 @@ import { Word } from '@/types'
 import Modal from '@/components/Modal'
 import { CET6_SAMPLE } from '@/data/cet6_sample'
 import { fetchCET6Vocabulary } from '@/services/dictionaryService'
+import { useLanguageStore } from '@/store/languageStore'
 
 const WordsPage = () => {
   const { user, isMock } = useAuthStore()
+  const { t } = useLanguageStore()
   const [words, setWords] = useState<Word[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -354,15 +356,14 @@ const WordsPage = () => {
     <div className="space-y-8 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-primary mb-2">Vocabulary</h1>
-          <p className="text-muted-foreground">Build your personal dictionary, one word at a time.</p>
+          <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('words.title')}</h1>
         </div>
         <div className="flex gap-3">
           <button onClick={openLibrary} className="btn-outline flex items-center gap-2">
-            <Book className="h-4 w-4" /> CET-6 Library
+            <Book className="h-4 w-4" /> {t('words.importCET6')}
           </button>
           <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Add Word
+            <Plus className="h-4 w-4" /> {t('words.addWord')}
           </button>
         </div>
       </div>
@@ -372,7 +373,7 @@ const WordsPage = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input 
             type="text"
-            placeholder="Search words..." 
+            placeholder={t('words.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input-base pl-10"
@@ -438,7 +439,7 @@ const WordsPage = () => {
           className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <GraduationCap className="h-4 w-4" />
-          Start Dictation
+          {t('words.dictationMode')}
         </button>
       </div>
 
@@ -446,7 +447,7 @@ const WordsPage = () => {
         <div className="text-center py-12 text-muted-foreground">Loading vocabulary...</div>
       ) : filteredWords.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-border bg-muted/30">
-          <p className="text-muted-foreground">No words found matching your criteria.</p>
+          <p className="text-muted-foreground">{t('words.empty')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -512,17 +513,17 @@ const WordsPage = () => {
       <Modal
         isOpen={isLibraryOpen}
         onClose={() => setIsLibraryOpen(false)}
-        title="Import from CET-6 Library"
+        title={t('words.importCET6')}
       >
         <div className="space-y-4">
           <div className="max-h-[60vh] overflow-y-auto border border-border rounded-lg divide-y divide-border">
             {libraryLoading ? (
               <div className="p-8 text-center text-muted-foreground">
-                Loading library...
+                {t('words.importing')}
               </div>
             ) : libraryWords.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
-                No words loaded. Please try again.
+                {t('words.importError')}
               </div>
             ) : (
               libraryWords.map((word, idx) => {
@@ -563,7 +564,7 @@ const WordsPage = () => {
             </span>
             <div className="flex gap-3">
               <button onClick={() => setIsLibraryOpen(false)} className="btn-outline">
-                Cancel
+                {t('home.cancel')}
               </button>
               <button 
                 onClick={handleImportCET6} 
@@ -585,7 +586,7 @@ const WordsPage = () => {
             <div className="p-6 border-b border-border flex justify-between items-center bg-muted/30">
               <div className="flex items-center gap-3">
                 <GraduationCap className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-serif font-bold">Dictation Mode</h2>
+                <h2 className="text-2xl font-serif font-bold">{t('words.dictationMode')}</h2>
               </div>
               <div className="flex items-center gap-4">
                 <span className="font-mono text-sm">
@@ -634,12 +635,12 @@ const WordsPage = () => {
                   }`}>
                     {dictationFeedback === 'correct' ? (
                       <div className="flex items-center justify-center gap-2 font-bold text-xl">
-                        <Check className="h-6 w-6" /> Correct!
+                        <Check className="h-6 w-6" /> {t('quiz.correct')}
                       </div>
                     ) : (
                       <div className="space-y-1">
                         <div className="flex items-center justify-center gap-2 font-bold text-xl">
-                          <X className="h-6 w-6" /> Incorrect
+                          <X className="h-6 w-6" /> {t('quiz.incorrect')}
                         </div>
                         <p className="text-muted-foreground">
                           Answer: <span className="font-bold text-foreground">{dictationQueue[currentDictationIndex].english_word}</span>
@@ -668,11 +669,11 @@ const WordsPage = () => {
             <div className="p-6 border-t border-border flex justify-end">
               {dictationFeedback === 'idle' ? (
                 <button onClick={checkSpelling} className="btn-primary px-8 py-3 text-lg w-full md:w-auto">
-                  Check Answer
+                  {t('quiz.submit')}
                 </button>
               ) : (
                 <button onClick={nextDictationWord} className="btn-primary px-8 py-3 text-lg w-full md:w-auto flex items-center justify-center gap-2">
-                  Next Word <Volume2 className="h-4 w-4" />
+                  {t('quiz.next')} <Volume2 className="h-4 w-4" />
                 </button>
               )}
             </div>
@@ -684,11 +685,11 @@ const WordsPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingWord ? "Edit Word" : "Add New Word"}
+        title={editingWord ? "Edit Word" : t('words.addWord')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">English Word</label>
+            <label className="block text-sm font-medium mb-1">{t('words.table.word')}</label>
             <input
               type="text"
               required
@@ -709,7 +710,7 @@ const WordsPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Chinese Meaning</label>
+            <label className="block text-sm font-medium mb-1">{t('words.table.translation')}</label>
             <input
               type="text"
               required
@@ -720,7 +721,7 @@ const WordsPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Example Sentence</label>
+            <label className="block text-sm font-medium mb-1">{t('words.table.example')}</label>
             <textarea
               value={formData.example_sentence}
               onChange={e => setFormData({...formData, example_sentence: e.target.value})}
@@ -730,10 +731,10 @@ const WordsPage = () => {
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={closeModal} className="btn-outline">
-              Cancel
+              {t('home.cancel')}
             </button>
             <button type="submit" className="btn-primary">
-              {editingWord ? 'Save Changes' : 'Add Word'}
+              {editingWord ? 'Save Changes' : t('words.addWord')}
             </button>
           </div>
         </form>

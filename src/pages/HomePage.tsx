@@ -4,9 +4,11 @@ import { supabase } from '@/supabase/client'
 import { Plus } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { useNavigate } from 'react-router-dom'
+import { useLanguageStore } from '@/store/languageStore'
 
 const HomePage = () => {
   const { user, isMock } = useAuthStore()
+  const { t } = useLanguageStore()
   const [wordCount, setWordCount] = useState<number>(0)
   const [readingsCount, setReadingsCount] = useState<number>(0)
   const [streakDays, setStreakDays] = useState<number>(0)
@@ -34,13 +36,22 @@ const HomePage = () => {
   useEffect(() => {
     fetchStats()
     // Load saved image from local storage if exists
-    try {
-      const savedImage = localStorage.getItem('home_image')
-      if (savedImage) {
-        setHomeImage(savedImage)
+    const updateAvatar = () => {
+      try {
+        const savedImage = localStorage.getItem('home_image')
+        if (savedImage) {
+          setHomeImage(savedImage)
+        }
+      } catch (e) {
+        console.error("Failed to load image from storage", e)
       }
-    } catch (e) {
-      console.error("Failed to load image from storage", e)
+    }
+    
+    updateAvatar()
+    window.addEventListener('avatar-updated', updateAvatar)
+    
+    return () => {
+      window.removeEventListener('avatar-updated', updateAvatar)
     }
   }, [user, isMock])
 
@@ -149,21 +160,21 @@ const HomePage = () => {
             ) : (
               <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground w-full h-full bg-slate-100">
                 <Plus className="h-8 w-8 opacity-50" />
-                <span className="font-serif italic text-sm">Add Photo</span>
+                <span className="font-serif italic text-sm">{t('home.addPhoto')}</span>
               </div>
             )}
             
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">Change Photo</span>
+              <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">{t('home.changePhoto')}</span>
             </div>
           </div>
 
           <div className="flex-1 pt-4">
             <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight mb-4">
-              Welcome Back
+              {t('home.welcome')}
             </h1>
             <p className="text-xl text-muted-foreground font-serif italic mb-6">
-              "The limits of my language mean the limits of my world."
+              {t('home.quote')}
             </p>
           </div>
         </div>
@@ -174,34 +185,34 @@ const HomePage = () => {
           onClick={() => navigate('/reading')}
           className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
         >
-          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Daily Readings</h2>
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{t('home.readings')}</h2>
           <div className="text-4xl font-serif font-bold mb-2">{readingsCount}</div>
-          <p className="text-muted-foreground text-sm">Articles read total</p>
+          <p className="text-muted-foreground text-sm">{t('home.readingsDesc')}</p>
         </div>
         
         <div 
           onClick={() => navigate('/words')}
           className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
         >
-          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Word Streak</h2>
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{t('home.streak')}</h2>
           <div className="text-4xl font-serif font-bold mb-2">{streakDays} <span className="text-lg font-normal text-muted-foreground">days</span></div>
-          <p className="text-muted-foreground text-sm">Consecutive learning days</p>
+          <p className="text-muted-foreground text-sm">{t('home.streakDesc')}</p>
         </div>
 
         <div 
           onClick={() => navigate('/words')}
           className="bg-card border border-border p-8 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary group"
         >
-          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Words Learned</h2>
+          <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{t('home.words')}</h2>
           <div className="text-4xl font-serif font-bold mb-2">{wordCount}</div>
-          <p className="text-muted-foreground text-sm">Total vocabulary size</p>
+          <p className="text-muted-foreground text-sm">{t('home.wordsDesc')}</p>
         </div>
       </div>
 
       <Modal
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
-        title="Update Profile Photo"
+        title={t('home.updatePhoto')}
       >
         <div className="space-y-6 max-h-[80vh] overflow-y-auto p-1">
           <div className="space-y-6">
@@ -211,14 +222,14 @@ const HomePage = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                   <Plus className="h-12 w-12 opacity-50" />
-                  <span className="font-serif italic">No image selected</span>
+                  <span className="font-serif italic">{t('home.noImage')}</span>
                 </div>
               )}
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-3">Choose a Preset Avatar</label>
+                <label className="block text-sm font-medium mb-3">{t('home.choosePreset')}</label>
                 <div className="grid grid-cols-4 gap-2">
                   {PRESET_AVATARS.map((avatar) => (
                     <div 
@@ -249,14 +260,14 @@ const HomePage = () => {
                   <span className="w-full border-t border-muted" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or upload your own</span>
+                  <span className="bg-background px-2 text-muted-foreground">{t('home.upload')}</span>
                 </div>
               </div>
 
               <div className="flex justify-center">
                 <label className="btn-primary cursor-pointer flex items-center gap-2 px-6 py-2 w-full justify-center">
                   <Plus className="h-4 w-4" />
-                  <span>Select from Device</span>
+                  <span>{t('home.selectDevice')}</span>
                   <input 
                     type="file" 
                     accept="image/*" 
@@ -266,7 +277,7 @@ const HomePage = () => {
                 </label>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Supports JPG, PNG, GIF (Max 5MB recommended)
+                {t('home.supports')}
               </p>
             </div>
           </div>
@@ -276,7 +287,7 @@ const HomePage = () => {
             onClick={() => setIsImageModalOpen(false)}
             className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Cancel
+            {t('home.cancel')}
           </button>
         </div>
       </Modal>

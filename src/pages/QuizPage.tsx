@@ -4,9 +4,11 @@ import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { QuizScore } from '@/types'
 import Modal from '@/components/Modal'
+import { useLanguageStore } from '@/store/languageStore'
 
 const QuizPage = () => {
   const { user, isMock } = useAuthStore()
+  const { t } = useLanguageStore()
   const [scores, setScores] = useState<QuizScore[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -109,11 +111,11 @@ const QuizPage = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-primary mb-2">Quiz Records</h1>
+          <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('quiz.title')}</h1>
           <p className="text-muted-foreground">Track your performance and improvements.</p>
         </div>
         <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" /> Record Score
+          <Plus className="h-4 w-4" /> {t('quiz.start')}
         </button>
       </div>
 
@@ -157,18 +159,18 @@ const QuizPage = () => {
         <div className="text-center py-12 text-muted-foreground">Loading scores...</div>
       ) : scores.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-border bg-muted/30">
-          <p className="text-muted-foreground">No quiz records found. Take a quiz!</p>
+          <p className="text-muted-foreground">{t('quiz.noHistory')}</p>
         </div>
       ) : (
         <div className="bg-card border border-border overflow-hidden">
           <table className="w-full text-sm text-left">
             <thead className="bg-muted text-muted-foreground font-medium border-b border-border">
               <tr>
-                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4">{t('quiz.date')}</th>
                 <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4">Questions</th>
-                <th className="px-6 py-4">Correct</th>
-                <th className="px-6 py-4">Score</th>
+                <th className="px-6 py-4">{t('quiz.question')}s</th>
+                <th className="px-6 py-4">{t('quiz.correct')}</th>
+                <th className="px-6 py-4">{t('quiz.score')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -199,7 +201,7 @@ const QuizPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title="Record Quiz Result"
+        title={t('quiz.result')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -216,7 +218,7 @@ const QuizPage = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Total Questions</label>
+            <label className="block text-sm font-medium mb-1">{t('quiz.question')}s</label>
             <input
               type="number"
               required
@@ -227,7 +229,7 @@ const QuizPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Correct Answers</label>
+            <label className="block text-sm font-medium mb-1">{t('quiz.correct')} Answers</label>
             <input
               type="number"
               required
@@ -240,10 +242,10 @@ const QuizPage = () => {
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={closeModal} className="btn-outline">
-              Cancel
+              {t('home.cancel')}
             </button>
             <button type="submit" className="btn-primary">
-              Save Record
+              {t('notes.save')}
             </button>
           </div>
         </form>

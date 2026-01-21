@@ -4,9 +4,11 @@ import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { LearningNote } from '@/types'
 import Modal from '@/components/Modal'
+import { useLanguageStore } from '@/store/languageStore'
 
 const NotesPage = () => {
   const { user, isMock } = useAuthStore()
+  const { t } = useLanguageStore()
   const [notes, setNotes] = useState<LearningNote[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -154,11 +156,11 @@ const NotesPage = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-primary mb-2">Learning Notes</h1>
+          <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('notes.title')}</h1>
           <p className="text-muted-foreground">Capture your thoughts, ideas, and reflections.</p>
         </div>
         <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" /> New Note
+          <Plus className="h-4 w-4" /> {t('notes.addNote')}
         </button>
       </div>
 
@@ -166,7 +168,7 @@ const NotesPage = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input 
           type="text"
-          placeholder="Search notes..." 
+          placeholder={t('notes.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="input-base pl-10"
@@ -177,7 +179,7 @@ const NotesPage = () => {
         <div className="text-center py-12 text-muted-foreground">Loading notes...</div>
       ) : filteredNotes.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-border bg-muted/30">
-          <p className="text-muted-foreground">No notes found. Write something down!</p>
+          <p className="text-muted-foreground">{t('notes.empty')}</p>
         </div>
       ) : (
         <div className="columns-1 md:columns-2 gap-6 space-y-6">
@@ -220,7 +222,7 @@ const NotesPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingNote ? "Edit Note" : "Create New Note"}
+        title={editingNote ? t('notes.edit') : t('notes.addNote')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -256,10 +258,10 @@ const NotesPage = () => {
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={closeModal} className="btn-outline">
-              Cancel
+              {t('home.cancel')}
             </button>
             <button type="submit" className="btn-primary">
-              {editingNote ? 'Save Changes' : 'Create Note'}
+              {editingNote ? t('notes.save') : t('notes.addNote')}
             </button>
           </div>
         </form>

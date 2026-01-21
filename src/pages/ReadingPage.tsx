@@ -4,9 +4,11 @@ import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { ReadingRecord } from '@/types'
 import Modal from '@/components/Modal'
+import { useLanguageStore } from '@/store/languageStore'
 
 const ReadingPage = () => {
   const { user, isMock } = useAuthStore()
+  const { t } = useLanguageStore()
   const [readings, setReadings] = useState<ReadingRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -176,11 +178,11 @@ const ReadingPage = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-primary mb-2">Daily Reading</h1>
+          <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('reading.title')}</h1>
           <p className="text-muted-foreground">Read, comprehend, and reflect.</p>
         </div>
         <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" /> Add Record
+          <Plus className="h-4 w-4" /> {t('reading.addArticle')}
         </button>
       </div>
 
@@ -188,7 +190,7 @@ const ReadingPage = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input 
           type="text"
-          placeholder="Search articles..." 
+          placeholder={t('reading.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="input-base pl-10"
@@ -199,7 +201,7 @@ const ReadingPage = () => {
         <div className="text-center py-12 text-muted-foreground">Loading readings...</div>
       ) : filteredReadings.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-border bg-muted/30">
-          <p className="text-muted-foreground">No reading records found. Start reading!</p>
+          <p className="text-muted-foreground">{t('reading.empty')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
@@ -246,7 +248,7 @@ const ReadingPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingReading ? "Edit Reading Record" : "Add New Reading"}
+        title={editingReading ? "Edit Reading Record" : t('reading.addArticle')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-end">
@@ -300,7 +302,7 @@ const ReadingPage = () => {
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={closeModal} className="btn-outline">
-              Cancel
+              {t('home.cancel')}
             </button>
             <button type="submit" className="btn-primary">
               {editingReading ? 'Save Changes' : 'Save Record'}
