@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Trash2, Edit2, BookOpen, ExternalLink, Clock } from 'lucide-react'
+import { Plus, Search, Trash2, Edit2, BookOpen, ExternalLink, Clock, Heart, Volume2, X } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { ReadingRecord } from '@/types'
 import Modal from '@/components/Modal'
 import { useLanguageStore } from '@/store/languageStore'
+import { CET6_READING_SAMPLE, CET6Article } from '@/data/cet6_reading'
 
 const ReadingPage = () => {
   const { user, isMock } = useAuthStore()
@@ -14,6 +15,11 @@ const ReadingPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingReading, setEditingReading] = useState<ReadingRecord | null>(null)
+  
+  // New States for Tab and Article View
+  const [activeTab, setActiveTab] = useState<'my-readings' | 'cet6-library'>('my-readings')
+  const [selectedArticle, setSelectedArticle] = useState<CET6Article | null>(null)
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -31,27 +37,33 @@ const ReadingPage = () => {
     setLoading(true)
     if (isMock) {
       // Mock data
-      const mockReadings: ReadingRecord[] = [
-        {
-          id: '1',
-          user_id: 'mock-user',
-          article_title: 'The Benefits of Bilingualism',
-          article_content: 'Speaking two languages rather than just one has obvious practical benefits in an increasingly globalized world. But in recent years, scientists have begun to show that the advantages of bilingualism are even more fundamental than being able to converse with a wider range of people. Being bilingual, it turns out, makes you smarter. It can have a profound effect on your brain, improving cognitive skills not related to language and even shielding against dementia in old age.',
-          reading_notes: 'Interesting point about dementia protection. Need to look up more studies on this.',
-          reading_time: 300,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          user_id: 'mock-user',
-          article_title: 'Minimalism in Design',
-          article_content: 'Minimalism is a design trend that started in the 20th century and continues today. It emphasizes simplicity and the removal of superfluous elements in a design. The mantra "less is more" is often associated with this movement.',
-          reading_notes: 'Good vocabulary: superfluous, mantra.',
-          reading_time: 180,
-          created_at: new Date(Date.now() - 86400000).toISOString()
-        }
-      ]
-      setReadings(mockReadings)
+      const storedReadings = localStorage.getItem('mock_readings')
+      if (storedReadings) {
+        setReadings(JSON.parse(storedReadings))
+      } else {
+        const mockReadings: ReadingRecord[] = [
+          {
+            id: '1',
+            user_id: 'mock-user',
+            article_title: 'The Benefits of Bilingualism',
+            article_content: 'Speaking two languages rather than just one has obvious practical benefits in an increasingly globalized world. But in recent years, scientists have begun to show that the advantages of bilingualism are even more fundamental than being able to converse with a wider range of people. Being bilingual, it turns out, makes you smarter. It can have a profound effect on your brain, improving cognitive skills not related to language and even shielding against dementia in old age.',
+            reading_notes: 'Interesting point about dementia protection. Need to look up more studies on this.',
+            reading_time: 300,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: '2',
+            user_id: 'mock-user',
+            article_title: 'Minimalism in Design',
+            article_content: 'Minimalism is a design trend that started in the 20th century and continues today. It emphasizes simplicity and the removal of superfluous elements in a design. The mantra "less is more" is often associated with this movement.',
+            reading_notes: 'Good vocabulary: superfluous, mantra.',
+            reading_time: 180,
+            created_at: new Date(Date.now() - 86400000).toISOString()
+          }
+        ]
+        setReadings(mockReadings)
+        localStorage.setItem('mock_readings', JSON.stringify(mockReadings))
+      }
       setLoading(false)
     } else if (user) {
       const { data, error } = await supabase
@@ -68,8 +80,9 @@ const ReadingPage = () => {
     e.preventDefault()
     
     if (isMock) {
+      let updatedReadings: ReadingRecord[]
       if (editingReading) {
-        setReadings(readings.map(r => r.id === editingReading.id ? { ...r, ...formData } : r))
+        updatedReadings = readings.map(r => r.id === editingReading.id ? { ...r, ...formData } : r)
       } else {
         const newReading: ReadingRecord = {
           id: Math.random().toString(),
@@ -77,8 +90,10 @@ const ReadingPage = () => {
           ...formData,
           created_at: new Date().toISOString()
         }
-        setReadings([newReading, ...readings])
+        updatedReadings = [newReading, ...readings]
       }
+      setReadings(updatedReadings)
+      localStorage.setItem('mock_readings', JSON.stringify(updatedReadings))
       closeModal()
     } else if (user) {
       try {
@@ -108,7 +123,9 @@ const ReadingPage = () => {
     if (!confirm('Are you sure you want to delete this reading record?')) return
 
     if (isMock) {
-      setReadings(readings.filter(r => r.id !== id))
+      const updatedReadings = readings.filter(r => r.id !== id)
+      setReadings(updatedReadings)
+      localStorage.setItem('mock_readings', JSON.stringify(updatedReadings))
     } else {
       try {
         const { error } = await supabase.from('reading_records').delete().eq('id', id)
@@ -169,9 +186,27 @@ const ReadingPage = () => {
     setEditingReading(null)
   }
 
+  const openArticle = (article: CET6Article) => {
+    setSelectedArticle(article)
+    setIsArticleModalOpen(true)
+  }
+
+  const speakText = (text: string, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'en-US'
+    utterance.rate = 0.9
+    window.speechSynthesis.speak(utterance)
+  }
+
   const filteredReadings = readings.filter(reading => 
     reading.article_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     reading.article_content.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const filteredCET6 = CET6_READING_SAMPLE.filter(article =>
+    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    article.summary.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -179,10 +214,38 @@ const ReadingPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('reading.title')}</h1>
-          <p className="text-muted-foreground">Read, comprehend, and reflect.</p>
+          <p className="text-muted-foreground">{t('reading.subtitle')}</p>
         </div>
-        <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" /> {t('reading.addArticle')}
+        {activeTab === 'my-readings' && (
+          <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
+            <Plus className="h-4 w-4" /> {t('reading.addArticle')}
+          </button>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-6 border-b border-border">
+        <button
+          onClick={() => setActiveTab('my-readings')}
+          className={`pb-3 text-sm font-bold transition-colors relative ${
+            activeTab === 'my-readings' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {t('reading.tabs.myReadings')}
+          {activeTab === 'my-readings' && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('cet6-library')}
+          className={`pb-3 text-sm font-bold transition-colors relative ${
+            activeTab === 'cet6-library' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {t('reading.tabs.cet6Library')}
+          {activeTab === 'cet6-library' && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
+          )}
         </button>
       </div>
 
@@ -197,51 +260,174 @@ const ReadingPage = () => {
         />
       </div>
 
-      {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading readings...</div>
-      ) : filteredReadings.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-border bg-muted/30">
-          <p className="text-muted-foreground">{t('reading.empty')}</p>
-        </div>
+      {activeTab === 'my-readings' ? (
+        loading ? (
+          <div className="text-center py-12 text-muted-foreground">Loading readings...</div>
+        ) : filteredReadings.length === 0 ? (
+          <div className="text-center py-12 border border-dashed border-border bg-muted/30">
+            <p className="text-muted-foreground">{t('reading.empty')}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6">
+            {filteredReadings.map((reading) => (
+              <div key={reading.id} className="group bg-card border border-border p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-2xl font-serif font-bold group-hover:text-primary/80 transition-colors">
+                    {reading.article_title}
+                  </h3>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => openEditModal(reading)} className="p-1 hover:text-primary text-muted-foreground transition-colors">
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => handleDelete(reading.id)} className="p-1 hover:text-red-600 text-muted-foreground transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="prose prose-neutral max-w-none mb-6 text-foreground/80 line-clamp-3">
+                  {reading.article_content}
+                </div>
+
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground border-t border-border pt-4">
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {Math.round(reading.reading_time / 60)} {t('reading.minutes')} read
+                  </div>
+                  {reading.reading_notes && (
+                    <div className="flex items-center gap-1 text-primary">
+                      <BookOpen className="h-4 w-4" />
+                      Has notes
+                    </div>
+                  )}
+                  <div className="ml-auto font-serif italic">
+                    {new Date(reading.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {filteredReadings.map((reading) => (
-            <div key={reading.id} className="group bg-card border border-border p-6 hover:shadow-lg transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-2xl font-serif font-bold group-hover:text-primary/80 transition-colors">
-                  {reading.article_title}
-                </h3>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEditModal(reading)} className="p-1 hover:text-primary text-muted-foreground transition-colors">
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => handleDelete(reading.id)} className="p-1 hover:text-red-600 text-muted-foreground transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+        /* CET-6 Library View */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCET6.map((article) => (
+            <div key={article.id} className="group bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={article.imageUrl} 
+                  alt={article.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <span className={`px-2 py-1 text-xs font-bold rounded bg-black/50 text-white backdrop-blur-sm`}>
+                    {article.category}
+                  </span>
                 </div>
               </div>
               
-              <div className="prose prose-neutral max-w-none mb-6 text-foreground/80 line-clamp-3">
-                {reading.article_content}
-              </div>
-
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground border-t border-border pt-4">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {Math.round(reading.reading_time / 60)} mins read
+              <div className="p-5 flex flex-col flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-serif font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    {article.title}
+                  </h3>
                 </div>
-                {reading.reading_notes && (
-                  <div className="flex items-center gap-1 text-primary">
-                    <BookOpen className="h-4 w-4" />
-                    Has notes
+                
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
+                  {article.summary}
+                </p>
+                
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className={`px-2 py-0.5 rounded border ${
+                      article.difficulty === 'Easy' ? 'border-green-200 text-green-700 bg-green-50' :
+                      article.difficulty === 'Medium' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
+                      'border-red-200 text-red-700 bg-red-50'
+                    }`}>
+                      {article.difficulty}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> {article.duration} {t('reading.minutes')}
+                    </span>
                   </div>
-                )}
-                <div className="ml-auto font-serif italic">
-                  {new Date(reading.created_at).toLocaleDateString()}
+                  
+                  <button 
+                    onClick={() => openArticle(article)}
+                    className="text-sm font-bold text-primary hover:underline flex items-center gap-1"
+                  >
+                    {t('reading.readMore')} <ExternalLink className="h-3 w-3" />
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Article Reading Modal */}
+      {selectedArticle && (
+        <div className={`fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto transition-opacity duration-300 ${isArticleModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
+            <div className="bg-card w-full max-w-4xl shadow-2xl border border-border rounded-xl overflow-hidden animate-in zoom-in-95 duration-300">
+              {/* Modal Header */}
+              <div className="relative h-64 md:h-80 w-full">
+                <img 
+                  src={selectedArticle.imageUrl} 
+                  alt={selectedArticle.title} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
+                  <div className="flex gap-2 mb-3">
+                    <span className="px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded uppercase tracking-wider">
+                      {selectedArticle.category}
+                    </span>
+                    <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded backdrop-blur-md">
+                      {selectedArticle.difficulty}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-2 leading-tight">
+                    {selectedArticle.title}
+                  </h2>
+                  <div className="flex items-center gap-4 text-white/80 text-sm">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" /> {selectedArticle.duration} {t('reading.minutes')} read
+                    </span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsArticleModalOpen(false)}
+                  className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 backdrop-blur-md transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-8 md:p-12">
+                <div className="flex justify-between items-center mb-8 pb-6 border-b border-border">
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => speakText(selectedArticle.content)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium"
+                    >
+                      <Volume2 className="h-5 w-5" /> Listen
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-pink-50 text-muted-foreground hover:text-pink-500 transition-colors group">
+                      <Heart className="h-5 w-5 group-hover:fill-pink-500 transition-colors" /> Favorite
+                    </button>
+                  </div>
+                </div>
+
+                <div className="prose prose-lg prose-neutral max-w-none font-serif leading-relaxed">
+                  {selectedArticle.content.split('\n\n').map((paragraph, idx) => (
+                    <p key={idx} className="mb-6 text-foreground/90">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

@@ -195,6 +195,7 @@ const translations = {
 
     // Reading Page
     'reading.title': '每日阅读',
+    'reading.subtitle': '阅读，理解，思考。',
     'reading.addArticle': '添加新文章',
     'reading.searchPlaceholder': '搜索文章...',
     'reading.empty': '暂无阅读记录。开始今天的阅读吧！',
@@ -202,6 +203,12 @@ const translations = {
     'reading.finished': '已完成',
     'reading.delete': '删除',
     'reading.view': '查看',
+    'reading.tabs.myReadings': '我的阅读',
+    'reading.tabs.cet6Library': '六级阅读库',
+    'reading.readMore': '阅读全文',
+    'reading.difficulty': '难度',
+    'reading.duration': '时长',
+    'reading.minutes': '分钟',
 
     // Quiz Page
     'quiz.title': '语法测验',
