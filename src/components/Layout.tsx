@@ -7,9 +7,12 @@ import { useAuthStore } from '@/store/authStore'
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [language, setLanguage] = useState<'en' | 'zh'>('zh')
   const navigate = useNavigate()
   const { signOut, user } = useAuthStore()
   const profileRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Load avatar from localStorage to sync with HomePage
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -44,12 +47,46 @@ const Layout = () => {
   }, [])
 
   const handleLogout = async () => {
-    await signOut()
-    navigate('/login')
+    try {
+      await signOut()
+      navigate('/login', { replace: true })
+    } catch (error) {
+      console.error('Logout failed:', error)
+      navigate('/login')
+    }
+  }
+
+  const handleAvatarClick = () => {
+    // Trigger file input click
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setAvatarUrl(base64String)
+        localStorage.setItem('home_image', base64String)
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('avatar-updated'))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode)
+    // In a real app, you would apply theme changes here
+  }
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'en' ? 'zh' : 'en')
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${isDarkMode ? 'dark' : ''}`}>
       <header className="fixed top-0 left-0 right-0 h-16 bg-background border-b border-border z-50 px-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button 
