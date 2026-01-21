@@ -62,6 +62,18 @@ const Layout = () => {
     }
   }
 
+  const handleSwitchAccount = async () => {
+    // In a real app, this would show a list of saved accounts or a modal
+    // For now, we'll sign out and redirect to login with a query param
+    try {
+      await signOut()
+      navigate('/login?action=switch', { replace: true })
+    } catch (error) {
+      console.error('Switch account failed:', error)
+      navigate('/login')
+    }
+  }
+
   const handleAvatarClick = () => {
     // Trigger file input click
     fileInputRef.current?.click()
@@ -226,9 +238,7 @@ const Layout = () => {
                   
                   <div 
                     className="px-4 py-3 hover:bg-muted cursor-pointer flex items-center justify-between group"
-                    onClick={() => {
-                      handleLogout()
-                    }}
+                    onClick={handleSwitchAccount}
                   >
                     <span className="text-sm font-medium text-foreground group-hover:text-primary">{t('menu.switchAccount')}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />

@@ -16,24 +16,20 @@ const HomePage = () => {
   // Using a solid color placeholder logic instead of an image tag for default to ensure reliability
   const [homeImage, setHomeImage] = useState<string | null>(null)
 
-  const PRESET_AVATARS = [
-    { id: 1, prompt: "3D Disney Pixar style cute Shiba Inu dog, soft fur, bright eyes, vibrant background" },
-    { id: 2, prompt: "3D Disney Pixar style cool cat wearing sunglasses, confident expression, vibrant background" },
-    { id: 3, prompt: "3D Disney Pixar style cute boy with messy hair, friendly smile, vibrant background" },
-    { id: 4, prompt: "3D Disney Pixar style cute girl with pigtails, happy expression, vibrant background" },
-    { id: 5, prompt: "3D Disney Pixar style wise owl with glasses, intellectual look, vibrant background" },
-    { id: 6, prompt: "3D Disney Pixar style friendly robot, sleek design, glowing eyes, vibrant background" },
-    { id: 7, prompt: "3D Disney Pixar style cute panda eating bamboo, fluffy fur, vibrant background" },
-    { id: 8, prompt: "3D Disney Pixar style brave astronaut, detailed space suit, vibrant background" },
-    { id: 9, prompt: "3D Disney Pixar style cute ninja, mysterious look, vibrant background" },
-    { id: 10, prompt: "3D Disney Pixar style magical unicorn, rainbow mane, vibrant background" },
-    { id: 11, prompt: "3D Disney Pixar style cute pirate with eyepatch, adventurous look, vibrant background" },
-    { id: 12, prompt: "3D Disney Pixar style cute koala bear, fluffy texture, vibrant background" },
+  const PRESET_AVATARS: { id: number; url: string; prompt: string }[] = [
+    { id: 1, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix", prompt: "Man 1" },
+    { id: 2, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", prompt: "Woman 1" },
+    { id: 3, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob", prompt: "Man 2" },
+    { id: 4, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Willow", prompt: "Woman 2" },
+    { id: 5, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack", prompt: "Man 3" },
+    { id: 6, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Milo", prompt: "Man 4" },
+    { id: 7, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bella", prompt: "Woman 3" },
+    { id: 8, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Leo", prompt: "Man 5" },
+    { id: 9, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lilly", prompt: "Woman 4" },
+    { id: 10, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe", prompt: "Woman 5" },
+    { id: 11, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam", prompt: "Man 6" },
+    { id: 12, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna", prompt: "Woman 6" },
   ]
-
-  const getAvatarUrl = (prompt: string) => {
-    return `https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=square`
-  }
 
   useEffect(() => {
     fetchStats()
@@ -207,7 +203,7 @@ const HomePage = () => {
         onClose={() => setIsImageModalOpen(false)}
         title="Update Profile Photo"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 max-h-[80vh] overflow-y-auto p-1">
           <div className="space-y-6">
             <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative flex items-center justify-center">
               {homeImage ? (
@@ -228,15 +224,16 @@ const HomePage = () => {
                     <div 
                       key={avatar.id}
                       onClick={() => {
-                        const url = getAvatarUrl(avatar.prompt)
-                        setHomeImage(url)
-                        localStorage.setItem('home_image', url)
+                        setHomeImage(avatar.url)
+                        localStorage.setItem('home_image', avatar.url)
                         setIsImageModalOpen(false)
+                        // Trigger avatar update event
+                        window.dispatchEvent(new Event('avatar-updated'))
                       }}
-                      className="aspect-square rounded-lg overflow-hidden border border-border cursor-pointer hover:ring-2 hover:ring-primary transition-all relative group"
+                      className="aspect-square rounded-lg overflow-hidden border border-border cursor-pointer hover:ring-2 hover:ring-primary transition-all relative group bg-muted"
                     >
                       <img 
-                        src={getAvatarUrl(avatar.prompt)} 
+                        src={avatar.url} 
                         alt={avatar.prompt}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -273,6 +270,14 @@ const HomePage = () => {
               </p>
             </div>
           </div>
+        </div>
+        <div className="flex justify-end mt-6 pt-4 border-t border-border">
+          <button 
+            onClick={() => setIsImageModalOpen(false)}
+            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </Modal>
     </div>
