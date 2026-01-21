@@ -195,9 +195,9 @@ const Layout = () => {
                     className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
                     onClick={toggleTheme}
                   >
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">外观</span>
+                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Appearance</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{isDarkMode ? '深色' : '浅色'}</span>
+                      <span className="text-xs text-muted-foreground">{isDarkMode ? 'Dark' : 'Light'}</span>
                       <ChevronRight className="h-4 w-4 text-slate-400" />
                     </div>
                   </div>
@@ -206,9 +206,9 @@ const Layout = () => {
                     className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
                     onClick={toggleLanguage}
                   >
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">语言</span>
+                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Language</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{language === 'zh' ? '中文' : 'English'}</span>
+                      <span className="text-xs text-muted-foreground">{language === 'zh' ? 'Chinese' : 'English'}</span>
                       <ChevronRight className="h-4 w-4 text-slate-400" />
                     </div>
                   </div>
@@ -219,7 +219,7 @@ const Layout = () => {
                       handleLogout()
                     }}
                   >
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">切换账号</span>
+                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Switch Account</span>
                     <ChevronRight className="h-4 w-4 text-slate-400" />
                   </div>
                   
@@ -229,7 +229,7 @@ const Layout = () => {
                     onClick={handleLogout}
                     className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between group text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
-                    <span className="text-sm font-medium">退出登录</span>
+                    <span className="text-sm font-medium">Log out</span>
                     <LogOut className="h-4 w-4" />
                   </div>
                 </div>
