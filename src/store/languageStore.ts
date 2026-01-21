@@ -87,6 +87,7 @@ const translations = {
 
     // Quiz Page
     'quiz.title': 'Grammar Quiz',
+    'quiz.subtitle': 'Track your performance and improvements.',
     'quiz.start': 'Start New Quiz',
     'quiz.history': 'Quiz History',
     'quiz.score': 'Score',
@@ -99,6 +100,9 @@ const translations = {
     'quiz.result': 'Quiz Result',
     'quiz.correct': 'Correct!',
     'quiz.incorrect': 'Incorrect.',
+    'quiz.avgScore': 'Average Score',
+    'quiz.totalQuizzes': 'Total Quizzes',
+    'quiz.questionsAnswered': 'Questions Answered',
 
     // Notes Page
     'notes.title': 'My Notes',
@@ -201,6 +205,7 @@ const translations = {
 
     // Quiz Page
     'quiz.title': '语法测验',
+    'quiz.subtitle': '追踪您的成绩和进步。',
     'quiz.start': '开始新测验',
     'quiz.history': '测验历史',
     'quiz.score': '得分',
@@ -213,6 +218,9 @@ const translations = {
     'quiz.result': '测验结果',
     'quiz.correct': '回答正确！',
     'quiz.incorrect': '回答错误。',
+    'quiz.avgScore': '平均得分',
+    'quiz.totalQuizzes': '测验总数',
+    'quiz.questionsAnswered': '已答题数',
 
     // Notes Page
     'notes.title': '我的笔记',

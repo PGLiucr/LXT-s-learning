@@ -112,7 +112,7 @@ const QuizPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('quiz.title')}</h1>
-          <p className="text-muted-foreground">Track your performance and improvements.</p>
+          <p className="text-muted-foreground">{t('quiz.subtitle')}</p>
         </div>
         <button onClick={openAddModal} className="btn-primary flex items-center gap-2">
           <Plus className="h-4 w-4" /> {t('quiz.start')}
@@ -125,7 +125,7 @@ const QuizPage = () => {
             <div className="p-2 bg-muted rounded-none">
               <Trophy className="h-5 w-5" />
             </div>
-            <h3 className="font-bold">Average Score</h3>
+            <h3 className="font-bold">{t('quiz.avgScore')}</h3>
           </div>
           <div className="text-3xl font-serif font-bold">
             {scores.length > 0 
@@ -138,7 +138,7 @@ const QuizPage = () => {
             <div className="p-2 bg-muted rounded-none">
               <Target className="h-5 w-5" />
             </div>
-            <h3 className="font-bold">Total Quizzes</h3>
+            <h3 className="font-bold">{t('quiz.totalQuizzes')}</h3>
           </div>
           <div className="text-3xl font-serif font-bold">{scores.length}</div>
         </div>
@@ -147,7 +147,7 @@ const QuizPage = () => {
             <div className="p-2 bg-muted rounded-none">
               <BarChart2 className="h-5 w-5" />
             </div>
-            <h3 className="font-bold">Questions Answered</h3>
+            <h3 className="font-bold">{t('quiz.questionsAnswered')}</h3>
           </div>
           <div className="text-3xl font-serif font-bold">
             {scores.reduce((acc, curr) => acc + curr.total_questions, 0)}
