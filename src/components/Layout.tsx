@@ -140,31 +140,6 @@ const Layout = () => {
         
         {/* Right Side Icons */}
         <div className="flex items-center gap-3 md:gap-5">
-          <button className="hidden md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg transition-colors text-sm font-medium">
-            <Users className="h-4 w-4" />
-            <span>{t('menu.share')}</span>
-          </button>
-          
-          <button className="p-2 hover:bg-muted rounded-full transition-colors text-slate-600">
-            <Bell className="h-5 w-5" />
-          </button>
-          
-          <button className="hidden md:block p-2 hover:bg-muted rounded-full transition-colors text-slate-600">
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
-          
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-          
-          <button className="p-2 hover:bg-muted rounded-full transition-colors text-slate-600">
-            <Search className="h-5 w-5" />
-          </button>
-          
-          <button className="p-2 hover:bg-muted rounded-full transition-colors text-slate-600">
-            <Plus className="h-5 w-5" />
-          </button>
-
-          <div className="h-6 w-px bg-border hidden md:block"></div>
-
           {/* Avatar Dropdown */}
           <div className="relative" ref={profileRef}>
             <div 
