@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { Plus, Search, Trash2, Edit2, BookOpen, ExternalLink, Clock, Heart, Volume2, X } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Plus, Search, Trash2, Edit2, BookOpen, ExternalLink, Clock, Heart, Volume2, X, Play } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/supabase/client'
 import { ReadingRecord } from '@/types'
 import Modal from '@/components/Modal'
 import { useLanguageStore } from '@/store/languageStore'
 import { CET6_READING_SAMPLE, CET6Article } from '@/data/cet6_reading'
+import { generateLargeLibrary } from '@/data/articleGenerator'
+import { useAudioStore } from '@/store/audioStore'
+import FloatingPlayer from '@/components/FloatingPlayer'
 
 const ReadingPage = () => {
   const { user, isMock } = useAuthStore()
   const { t } = useLanguageStore()
+  const { playArticle } = useAudioStore()
   const [readings, setReadings] = useState<ReadingRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,6 +24,12 @@ const ReadingPage = () => {
   const [activeTab, setActiveTab] = useState<'my-readings' | 'cet6-library'>('my-readings')
   const [selectedArticle, setSelectedArticle] = useState<CET6Article | null>(null)
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+
+  // Generate large library once
+  const largeLibrary = useMemo(() => {
+    return [...CET6_READING_SAMPLE, ...generateLargeLibrary(1000)]
+  }, [])
   
   // Form state
   const [formData, setFormData] = useState({
@@ -31,7 +41,29 @@ const ReadingPage = () => {
 
   useEffect(() => {
     fetchReadings()
+    // Load favorites from local storage
+    const storedFavs = localStorage.getItem('favorites')
+    if (storedFavs) {
+      setFavorites(new Set(JSON.parse(storedFavs)))
+    }
   }, [user, isMock])
+
+  const toggleFavorite = (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    const newFavs = new Set(favorites)
+    if (newFavs.has(id)) {
+      newFavs.delete(id)
+    } else {
+      newFavs.add(id)
+    }
+    setFavorites(newFavs)
+    localStorage.setItem('favorites', JSON.stringify(Array.from(newFavs)))
+  }
+
+  const handlePlay = (article: CET6Article, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    playArticle(article, filteredCET6)
+  }
 
   const fetchReadings = async () => {
     setLoading(true)
@@ -191,26 +223,20 @@ const ReadingPage = () => {
     setIsArticleModalOpen(true)
   }
 
-  const speakText = (text: string, e?: React.MouseEvent) => {
-    e?.stopPropagation()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'en-US'
-    utterance.rate = 0.9
-    window.speechSynthesis.speak(utterance)
-  }
-
   const filteredReadings = readings.filter(reading => 
     reading.article_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     reading.article_content.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredCET6 = CET6_READING_SAMPLE.filter(article =>
+  const filteredCET6 = largeLibrary.filter(article =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.summary.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  ).slice(0, 50) // Limit render for now, or use pagination/infinite scroll
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      <FloatingPlayer />
+      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">{t('reading.title')}</h1>
@@ -312,7 +338,11 @@ const ReadingPage = () => {
         /* CET-6 Library View */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCET6.map((article) => (
-            <div key={article.id} className="group bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+            <div 
+              key={article.id} 
+              onClick={() => openArticle(article)}
+              className="group bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
+            >
               <div className="relative h-48 overflow-hidden">
                 <img 
                   src={article.imageUrl} 
@@ -327,6 +357,12 @@ const ReadingPage = () => {
                   <span className={`px-2 py-1 text-xs font-bold rounded bg-black/50 text-white backdrop-blur-sm`}>
                     {article.category}
                   </span>
+                </div>
+                {/* Overlay Play Button on Hover */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 text-white">
+                      <BookOpen className="h-6 w-6" />
+                   </div>
                 </div>
               </div>
               
@@ -356,10 +392,10 @@ const ReadingPage = () => {
                   </div>
                   
                   <button 
-                    onClick={() => openArticle(article)}
-                    className="text-sm font-bold text-primary hover:underline flex items-center gap-1"
+                    onClick={(e) => toggleFavorite(article.id, e)}
+                    className="p-2 rounded-full hover:bg-pink-50 transition-colors"
                   >
-                    {t('reading.readMore')} <ExternalLink className="h-3 w-3" />
+                    <Heart className={`h-5 w-5 ${favorites.has(article.id) ? 'fill-pink-500 text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`} />
                   </button>
                 </div>
               </div>
@@ -411,13 +447,17 @@ const ReadingPage = () => {
                 <div className="flex justify-between items-center mb-8 pb-6 border-b border-border">
                   <div className="flex gap-4">
                     <button 
-                      onClick={() => speakText(selectedArticle.content)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium"
+                      onClick={(e) => handlePlay(selectedArticle, e)}
+                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-bold shadow-lg active:scale-95"
                     >
-                      <Volume2 className="h-5 w-5" /> Listen
+                      <Play className="h-5 w-5 fill-current" /> Listen
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-pink-50 text-muted-foreground hover:text-pink-500 transition-colors group">
-                      <Heart className="h-5 w-5 group-hover:fill-pink-500 transition-colors" /> Favorite
+                    <button 
+                      onClick={(e) => toggleFavorite(selectedArticle.id, e)}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-full border border-border hover:bg-pink-50 transition-colors font-medium group ${favorites.has(selectedArticle.id) ? 'text-pink-500 border-pink-200 bg-pink-50' : 'text-muted-foreground'}`}
+                    >
+                      <Heart className={`h-5 w-5 ${favorites.has(selectedArticle.id) ? 'fill-current' : 'group-hover:text-pink-500'}`} /> 
+                      {favorites.has(selectedArticle.id) ? 'Favorited' : 'Favorite'}
                     </button>
                   </div>
                 </div>
@@ -441,6 +481,7 @@ const ReadingPage = () => {
         title={editingReading ? "Edit Reading Record" : t('reading.addArticle')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* ... existing form code ... */}
           <div className="flex justify-end">
             <button 
               type="button" 
