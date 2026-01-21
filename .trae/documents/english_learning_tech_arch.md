@@ -19,44 +19,51 @@ graph TD
 
 ## 2. 技术描述
 
-- **前端**: React@18 + Tailwind CSS@3 + Vite
-- **初始化工具**: vite-init
-- **后端**: Supabase (提供认证、数据库、存储服务)
-- **外部服务**: 英语短文API (如News API、Quote API等)
+* **前端**: React\@18 + Tailwind CSS\@3 + Vite
+
+* **初始化工具**: vite-init
+
+* **后端**: Supabase (提供认证、数据库、存储服务)
+
+* **外部服务**: 英语短文API (如News API、Quote API等)
 
 ## 3. 路由定义
 
-| 路由 | 用途 |
-|------|------|
-| / | 首页，展示学习概览和今日任务 |
-| /login | 登录页面，用户身份验证 |
-| /register | 注册页面，新用户注册 |
-| /words | 单词记录页面，管理学习词汇 |
-| /reading | 阅读短文页面，展示和记录阅读内容 |
-| /quiz | 题库页面，练习和管理题目 |
-| /notes | 学习心得页面，记录学习感悟 |
-| /profile | 个人中心，学习统计和设置 |
+| 路由        | 用途               |
+| --------- | ---------------- |
+| /         | 首页，展示学习概览和今日任务   |
+| /login    | 登录页面，用户身份验证      |
+| /register | 注册页面，新用户注册       |
+| /words    | 单词记录页面，管理学习词汇    |
+| /reading  | 阅读短文页面，展示和记录阅读内容 |
+| /quiz     | 题库页面，练习和管理题目     |
+| /notes    | 学习心得页面，记录学习感悟    |
+| /profile  | 个人中心，学习统计和设置     |
 
 ## 4. API定义
 
 ### 4.1 用户认证相关
+
 ```
 POST /api/auth/login
 ```
 
 请求参数：
-| 参数名 | 参数类型 | 是否必需 | 描述 |
-|--------|----------|----------|------|
-| email | string | true | 用户邮箱 |
+
+| 参数名      | 参数类型   | 是否必需 | 描述   |
+| -------- | ------ | ---- | ---- |
+| email    | string | true | 用户邮箱 |
 | password | string | true | 用户密码 |
 
 响应参数：
-| 参数名 | 参数类型 | 描述 |
-|--------|----------|------|
-| user | object | 用户信息 |
+
+| 参数名     | 参数类型   | 描述   |
+| ------- | ------ | ---- |
+| user    | object | 用户信息 |
 | session | object | 会话信息 |
 
 ### 4.2 单词管理相关
+
 ```
 GET /api/words
 POST /api/words
@@ -65,6 +72,7 @@ DELETE /api/words/:id
 ```
 
 ### 4.3 阅读记录相关
+
 ```
 GET /api/reading
 POST /api/reading
@@ -72,6 +80,7 @@ GET /api/external-article
 ```
 
 ### 4.4 题库相关
+
 ```
 GET /api/quiz/questions
 POST /api/quiz/answers
@@ -81,6 +90,7 @@ GET /api/quiz/statistics
 ## 5. 数据模型
 
 ### 5.1 数据模型定义
+
 ```mermaid
 erDiagram
   USERS ||--o{ WORDS : records
@@ -143,6 +153,7 @@ erDiagram
 ### 5.2 数据定义语言
 
 用户表 (users)
+
 ```sql
 -- 创建表
 CREATE TABLE users (
@@ -159,6 +170,7 @@ CREATE INDEX idx_users_email ON users(email);
 ```
 
 单词表 (words)
+
 ```sql
 -- 创建表
 CREATE TABLE words (
@@ -179,7 +191,8 @@ CREATE INDEX idx_words_created_at ON words(created_at DESC);
 CREATE INDEX idx_words_review_date ON words(review_date);
 ```
 
-阅读记录表 (reading_records)
+阅读记录表 (reading\_records)
+
 ```sql
 -- 创建表
 CREATE TABLE reading_records (
@@ -197,7 +210,8 @@ CREATE INDEX idx_reading_user_id ON reading_records(user_id);
 CREATE INDEX idx_reading_created_at ON reading_records(created_at DESC);
 ```
 
-题库成绩表 (quiz_scores)
+题库成绩表 (quiz\_scores)
+
 ```sql
 -- 创建表
 CREATE TABLE quiz_scores (
@@ -215,7 +229,8 @@ CREATE INDEX idx_quiz_user_id ON quiz_scores(user_id);
 CREATE INDEX idx_quiz_created_at ON quiz_scores(created_at DESC);
 ```
 
-学习心得表 (learning_notes)
+学习心得表 (learning\_notes)
+
 ```sql
 -- 创建表
 CREATE TABLE learning_notes (
@@ -234,6 +249,7 @@ CREATE INDEX idx_notes_created_at ON learning_notes(created_at DESC);
 ```
 
 ### 5.3 Supabase访问权限
+
 ```sql
 -- 基本访问权限
 GRANT SELECT ON users TO anon;
@@ -267,3 +283,5 @@ CREATE POLICY "用户只能查看自己的答题记录" ON quiz_scores
 
 CREATE POLICY "用户只能查看自己的学习心得" ON learning_notes
     FOR ALL USING (auth.uid() = user_id
+```
+

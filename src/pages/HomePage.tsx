@@ -16,12 +16,31 @@ const HomePage = () => {
   // Using a solid color placeholder logic instead of an image tag for default to ensure reliability
   const [homeImage, setHomeImage] = useState<string | null>(null)
 
+  const PRESET_AVATARS = [
+    { id: 1, prompt: "3D Disney Pixar style cute Shiba Inu dog, soft fur, bright eyes, vibrant background" },
+    { id: 2, prompt: "3D Disney Pixar style cool cat wearing sunglasses, confident expression, vibrant background" },
+    { id: 3, prompt: "3D Disney Pixar style cute boy with messy hair, friendly smile, vibrant background" },
+    { id: 4, prompt: "3D Disney Pixar style cute girl with pigtails, happy expression, vibrant background" },
+    { id: 5, prompt: "3D Disney Pixar style wise owl with glasses, intellectual look, vibrant background" },
+    { id: 6, prompt: "3D Disney Pixar style friendly robot, sleek design, glowing eyes, vibrant background" },
+    { id: 7, prompt: "3D Disney Pixar style cute panda eating bamboo, fluffy fur, vibrant background" },
+    { id: 8, prompt: "3D Disney Pixar style brave astronaut, detailed space suit, vibrant background" },
+    { id: 9, prompt: "3D Disney Pixar style cute ninja, mysterious look, vibrant background" },
+    { id: 10, prompt: "3D Disney Pixar style magical unicorn, rainbow mane, vibrant background" },
+    { id: 11, prompt: "3D Disney Pixar style cute pirate with eyepatch, adventurous look, vibrant background" },
+    { id: 12, prompt: "3D Disney Pixar style cute koala bear, fluffy texture, vibrant background" },
+  ]
+
+  const getAvatarUrl = (prompt: string) => {
+    return `https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=square`
+  }
+
   useEffect(() => {
     fetchStats()
     // Load saved image from local storage if exists
     try {
       const savedImage = localStorage.getItem('home_image')
-      if (savedImage && savedImage.startsWith('data:image')) {
+      if (savedImage) {
         setHomeImage(savedImage)
       }
     } catch (e) {
@@ -119,8 +138,8 @@ const HomePage = () => {
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-8">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          {/* Image Section - Top Left, Portrait, Moderate Size */}
+        <div className="flex flex-col md:flex-row-reverse gap-8 items-center md:items-start justify-between">
+          {/* Image Section - Top Right, Portrait, Moderate Size */}
           <div 
             className="w-48 h-64 flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer shadow-md bg-muted flex items-center justify-center"
             onClick={() => setIsImageModalOpen(true)}
@@ -189,34 +208,70 @@ const HomePage = () => {
         title="Update Profile Photo"
       >
         <div className="space-y-6">
-          <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative flex items-center justify-center">
-            {homeImage ? (
-              <img src={homeImage} alt="Preview" className="w-full h-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                <Plus className="h-12 w-12 opacity-50" />
-                <span className="font-serif italic">No image selected</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-center">Choose a new photo</label>
-            <div className="flex justify-center">
-              <label className="btn-primary cursor-pointer flex items-center gap-2 px-6 py-2">
-                <Plus className="h-4 w-4" />
-                <span>Select from Device</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleImageUpload} 
-                  className="hidden" 
-                />
-              </label>
+          <div className="space-y-6">
+            <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-muted border border-border relative flex items-center justify-center">
+              {homeImage ? (
+                <img src={homeImage} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                  <Plus className="h-12 w-12 opacity-50" />
+                  <span className="font-serif italic">No image selected</span>
+                </div>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Supports JPG, PNG, GIF (Max 5MB recommended)
-            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-3">Choose a Preset Avatar</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {PRESET_AVATARS.map((avatar) => (
+                    <div 
+                      key={avatar.id}
+                      onClick={() => {
+                        const url = getAvatarUrl(avatar.prompt)
+                        setHomeImage(url)
+                        localStorage.setItem('home_image', url)
+                        setIsImageModalOpen(false)
+                      }}
+                      className="aspect-square rounded-lg overflow-hidden border border-border cursor-pointer hover:ring-2 hover:ring-primary transition-all relative group"
+                    >
+                      <img 
+                        src={getAvatarUrl(avatar.prompt)} 
+                        alt={avatar.prompt}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-muted" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or upload your own</span>
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <label className="btn-primary cursor-pointer flex items-center gap-2 px-6 py-2 w-full justify-center">
+                  <Plus className="h-4 w-4" />
+                  <span>Select from Device</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageUpload} 
+                    className="hidden" 
+                  />
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Supports JPG, PNG, GIF (Max 5MB recommended)
+              </p>
+            </div>
           </div>
         </div>
       </Modal>
