@@ -224,10 +224,10 @@ const ReadingPage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-border">
+      <div className="flex gap-6 border-b border-border mb-6">
         <button
           onClick={() => setActiveTab('my-readings')}
-          className={`pb-3 text-sm font-bold transition-colors relative ${
+          className={`pb-3 text-base font-bold transition-colors relative px-2 ${
             activeTab === 'my-readings' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -238,7 +238,7 @@ const ReadingPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('cet6-library')}
-          className={`pb-3 text-sm font-bold transition-colors relative ${
+          className={`pb-3 text-base font-bold transition-colors relative px-2 ${
             activeTab === 'cet6-library' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -318,6 +318,10 @@ const ReadingPage = () => {
                   src={article.imageUrl} 
                   alt={article.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'; // Fallback image
+                  }}
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
                   <span className={`px-2 py-1 text-xs font-bold rounded bg-black/50 text-white backdrop-blur-sm`}>
