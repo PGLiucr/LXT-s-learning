@@ -8,7 +8,6 @@ import { useLanguageStore } from '@/store/languageStore'
 import { CET6_READING_SAMPLE, CET6Article } from '@/data/cet6_reading'
 import { generateLargeLibrary } from '@/data/articleGenerator'
 import { useAudioStore } from '@/store/audioStore'
-import FloatingPlayer from '@/components/FloatingPlayer'
 
 const ReadingPage = () => {
   const { user, isMock } = useAuthStore()
@@ -235,7 +234,6 @@ const ReadingPage = () => {
 
   return (
     <div className="space-y-8 relative">
-      <FloatingPlayer />
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

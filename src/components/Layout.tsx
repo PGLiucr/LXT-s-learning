@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { Menu, GraduationCap, Home, Share2, Bell, MoreHorizontal, Search, Plus, User, ChevronRight, Settings, HelpCircle, LogOut, Moon, Users } from 'lucide-react'
 import Sidebar from './Sidebar'
+import FloatingPlayer from './FloatingPlayer'
 import { useAuthStore } from '@/store/authStore'
 import { useLanguageStore } from '@/store/languageStore'
 
@@ -236,6 +237,8 @@ const Layout = () => {
       </header>
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      <FloatingPlayer />
 
       <main className="pt-24 pb-12 container mx-auto max-w-5xl px-6">
         <Outlet />
