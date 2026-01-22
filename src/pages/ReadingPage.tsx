@@ -227,10 +227,33 @@ const ReadingPage = () => {
     reading.article_content.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const [visibleCount, setVisibleCount] = useState(20)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+
+  // Infinite Scroll Handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 &&
+        !isLoadingMore &&
+        visibleCount < largeLibrary.length
+      ) {
+        setIsLoadingMore(true)
+        setTimeout(() => {
+          setVisibleCount(prev => prev + 20)
+          setIsLoadingMore(false)
+        }, 500)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isLoadingMore, visibleCount, largeLibrary.length])
+
   const filteredCET6 = largeLibrary.filter(article =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.summary.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 50)
+  ).slice(0, visibleCount)
 
   // Combined readings for "My Readings" tab
   const myReadingsCombined = useMemo(() => {
@@ -398,72 +421,80 @@ const ReadingPage = () => {
         )
       ) : (
         /* CET-6 Library View */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCET6.map((article) => (
-            <div 
-              key={article.id} 
-              onClick={() => openArticle(article)}
-              className="group bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={article.imageUrl} 
-                  alt={article.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'; // Fallback image
-                  }}
-                />
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <span className={`px-2 py-1 text-xs font-bold rounded bg-black/50 text-white backdrop-blur-sm`}>
-                    {article.category}
-                  </span>
-                </div>
-                {/* Overlay Play Button on Hover */}
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 text-white">
-                      <BookOpen className="h-6 w-6" />
-                   </div>
-                </div>
-              </div>
-              
-              <div className="p-5 flex flex-col flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-serif font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
-                    {article.title}
-                  </h3>
-                </div>
-                
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
-                  {article.summary}
-                </p>
-                
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className={`px-2 py-0.5 rounded border ${
-                      article.difficulty === 'Easy' ? 'border-green-200 text-green-700 bg-green-50' :
-                      article.difficulty === 'Medium' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
-                      'border-red-200 text-red-700 bg-red-50'
-                    }`}>
-                      {article.difficulty}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {article.duration} {t('reading.minutes')}
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCET6.map((article) => (
+              <div 
+                key={article.id} 
+                onClick={() => openArticle(article)}
+                className="group bg-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={article.imageUrl} 
+                    alt={article.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800'; // Fallback image
+                    }}
+                  />
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <span className={`px-2 py-1 text-xs font-bold rounded bg-black/50 text-white backdrop-blur-sm`}>
+                      {article.category}
                     </span>
                   </div>
+                  {/* Overlay Play Button on Hover */}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                     <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 text-white">
+                        <BookOpen className="h-6 w-6" />
+                     </div>
+                  </div>
+                </div>
+                
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-serif font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                  </div>
                   
-                  <button 
-                    onClick={(e) => toggleFavorite(article.id, e)}
-                    className="p-2 rounded-full hover:bg-pink-50 transition-colors"
-                  >
-                    <Heart className={`h-5 w-5 ${favorites.has(article.id) ? 'fill-pink-500 text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`} />
-                  </button>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
+                    {article.summary}
+                  </p>
+                  
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className={`px-2 py-0.5 rounded border ${
+                        article.difficulty === 'Easy' ? 'border-green-200 text-green-700 bg-green-50' :
+                        article.difficulty === 'Medium' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
+                        'border-red-200 text-red-700 bg-red-50'
+                      }`}>
+                        {article.difficulty}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {article.duration} {t('reading.minutes')}
+                      </span>
+                    </div>
+                    
+                    <button 
+                      onClick={(e) => toggleFavorite(article.id, e)}
+                      className="p-2 rounded-full hover:bg-pink-50 transition-colors"
+                    >
+                      <Heart className={`h-5 w-5 ${favorites.has(article.id) ? 'fill-pink-500 text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          
+          {isLoadingMore && (
+             <div className="flex justify-center py-8">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+             </div>
+          )}
+        </>
       )}
 
       {/* Article Reading Modal */}
@@ -543,7 +574,6 @@ const ReadingPage = () => {
         title={editingReading ? "Edit Reading Record" : t('reading.addArticle')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* ... existing form code ... */}
           <div className="flex justify-end">
             <button 
               type="button" 

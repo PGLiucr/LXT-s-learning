@@ -98,6 +98,13 @@ const FloatingPlayer = () => {
           <h4 className="text-xs font-bold truncate">{currentArticle.title}</h4>
           <p className="text-[10px] text-muted-foreground truncate">{currentArticle.category}</p>
         </div>
+
+        {/* Visualizer */}
+        <div className="flex items-end gap-0.5 h-4 ml-2 mr-2">
+            <div className="w-1 bg-primary rounded-t-sm visualizer-bar" style={{ animationDelay: '0s', animationPlayState: isPlaying ? 'running' : 'paused' }} />
+            <div className="w-1 bg-primary rounded-t-sm visualizer-bar" style={{ animationDelay: '0.1s', animationPlayState: isPlaying ? 'running' : 'paused' }} />
+            <div className="w-1 bg-primary rounded-t-sm visualizer-bar" style={{ animationDelay: '0.2s', animationPlayState: isPlaying ? 'running' : 'paused' }} />
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
